@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  description: MyText
+  accuracy: 1
+  executable_id: 
+  parameter_space_id: 
+  adapter: MyString
+
+two:
+  name: MyString
+  description: MyText
+  accuracy: 1
+  executable_id: 
+  parameter_space_id: 
+  adapter: MyString

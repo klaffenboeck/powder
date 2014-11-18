@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  input_params: MyText
+  result: MyText
+  project_settings_id: 
+  show: false
+
+two:
+  input_params: MyText
+  result: MyText
+  project_settings_id: 
+  show: false
