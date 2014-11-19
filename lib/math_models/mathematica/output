@@ -1,0 +1,4 @@
+36
+{OutputStream["stdout", 1], OutputStream["stderr", 2], InputStream["./script.m", 61]}
+2323
+Closing

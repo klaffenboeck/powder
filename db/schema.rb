@@ -11,7 +11,38 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141118194222) do
+ActiveRecord::Schema.define(version: 20141119010448) do
+
+  create_table "estimation_raw_data", force: true do |t|
+    t.text     "normal_sample_point_matrix"
+    t.decimal  "mu"
+    t.decimal  "theta"
+    t.text     "inv_var_matrix"
+    t.decimal  "sig2"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "math_model_runs", force: true do |t|
+    t.text     "input_params"
+    t.text     "result"
+    t.integer  "project_settings_id"
+    t.boolean  "show"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "math_model_runs", ["project_settings_id"], name: "index_math_model_runs_on_project_settings_id"
+
+  create_table "powder_data_quality_metrics", force: true do |t|
+    t.decimal  "value"
+    t.string   "type"
+    t.integer  "math_model_run_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "powder_data_quality_metrics", ["math_model_run_id"], name: "index_powder_data_quality_metrics_on_math_model_run_id"
 
   create_table "project_executables", force: true do |t|
     t.string   "command"
