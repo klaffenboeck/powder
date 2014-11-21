@@ -6,16 +6,26 @@ class Project::ParameterSpace < ActiveRecord::Base
   
   def map_normals(raw_data)
     if check_dims(size, raw_data.get_first.length)
-      raw_data.get_nspm.to_a.map do |matrix_row|
+      params = raw_data.get_nspm.to_a.map do |matrix_row|
         matrix_row.to_a.each_with_index.map {|col,i| map_normal_to_sample_point(col, boundaries[i])}
       end
     else
-      "WRONG DIMENSIONS"
+      return "WRONG DIMENSIONS"
     end
   end
   
   def boundaries
     self.content.values
+  end
+  
+  def generate_sample_points(rows, save_raw_data = false)
+    raw_data = Estimation::RawData.factory(rows: rows, cols: size)
+    #raw_data.save if save_raw_data
+    map_normals(raw_data)
+  end
+  
+  def size
+    self.content.length
   end
   
   private 
@@ -29,8 +39,6 @@ class Project::ParameterSpace < ActiveRecord::Base
     space1 == space2 ? true : false
   end
   
-  def size
-    self.content.length
-  end
+
   
 end
