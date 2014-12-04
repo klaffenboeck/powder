@@ -14,4 +14,5 @@ class MathModel::Adapter
     system("./" + command + " " + params.to_s)
   end
   
+  
 end

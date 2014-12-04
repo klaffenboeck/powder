@@ -1,4 +1,5 @@
 class MathModel::Adapter::Mathematica < MathModel::Adapter
+ 
   def executable_prefix
     super("mathematica")
   end
@@ -13,7 +14,9 @@ class MathModel::Adapter::Mathematica < MathModel::Adapter
       end
       File.delete("sampled.json")
     end
-    MathModel::Result.new(value: result.map {|arr| arr[pos]})
+    #MathModel::Result.new(value: result.map {|arr| arr[pos]})
+    PowderData::EmulatedPoints.new(points: result.map {|arr| arr[pos]})
   end
+  
   
 end

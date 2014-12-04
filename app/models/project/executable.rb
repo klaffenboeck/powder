@@ -15,7 +15,9 @@ class Project::Executable < ActiveRecord::Base
   
   def run(params, setting = nil, pos = nil)
     result = adapter.execute(command, params, pos)
-    MathModel::Run.new(input_params: params, result: result, project_setting: setting)
+    return MathModel::Run.new(input_params: params, result: result, project_setting: setting) if result.is_a?(MathModel::Result)
+    return MathModel::Run.new(input_params: params, emulated_points: result, project_setting: setting) if result.is_a?(PowderData::EmulatedPoints)
+    
   end
   
   private

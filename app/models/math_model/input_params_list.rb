@@ -15,13 +15,13 @@ class MathModel::InputParamsList
     end
     list
   end
+  
+  def_delegators :@list_of_params, :length, :size, :each, :each_with_index, :map, :collect
 
   def initialize(attributes = {})
     super
     self.list_of_params = []
   end
-  
-  def_delegators :@list_of_params, :length, :size, :each, :each_with_index, :map, :collect
   
   def create_run_list(setting)
     exec = setting.executable

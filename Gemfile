@@ -33,6 +33,8 @@ gem 'rinruby'
 
 gem 'bower-rails', "~> 0.9.1"
 
+gem 'byebug'
+
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

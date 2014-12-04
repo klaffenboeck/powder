@@ -1,5 +1,8 @@
 class Estimation::RawData < ActiveRecord::Base
   serialize :normal_sample_point_matrix, JSON
+  serialize :theta, JSON
+  serialize :inv_var_matrix, JSON
+  
   class << self
     def factory(params = {})
       raw_data = new

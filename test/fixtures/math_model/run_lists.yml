@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  run_list_holder_id: 
+  run_list_holder_type: Run list holder
+
+two:
+  run_list_holder_id: 
+  run_list_holder_type: Run list holder

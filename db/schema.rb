@@ -11,14 +11,33 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141121012920) do
+ActiveRecord::Schema.define(version: 20141124004017) do
+
+  create_table "estimation_functions", force: true do |t|
+    t.text     "content"
+    t.string   "type"
+    t.integer  "project_setting_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "raw_data_id"
+  end
+
+  add_index "estimation_functions", ["project_setting_id"], name: "index_estimation_functions_on_project_setting_id"
+  add_index "estimation_functions", ["raw_data_id"], name: "index_estimation_functions_on_raw_data_id"
 
   create_table "estimation_raw_data", force: true do |t|
     t.text     "normal_sample_point_matrix"
     t.decimal  "mu"
-    t.decimal  "theta"
+    t.text     "theta"
     t.text     "inv_var_matrix"
     t.decimal  "sig2"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "math_model_run_lists", force: true do |t|
+    t.integer  "run_list_holder_id"
+    t.string   "run_list_holder_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -30,8 +49,13 @@ ActiveRecord::Schema.define(version: 20141121012920) do
     t.boolean  "show"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "run_list_id"
+    t.integer  "emulated_points_id"
+    t.integer  "comparisons_id"
   end
 
+  add_index "math_model_runs", ["comparisons_id"], name: "index_math_model_runs_on_comparisons_id"
+  add_index "math_model_runs", ["emulated_points_id"], name: "index_math_model_runs_on_emulated_points_id"
   add_index "math_model_runs", ["project_setting_id"], name: "index_math_model_runs_on_project_setting_id"
 
   create_table "powder_data_comparisons", force: true do |t|
