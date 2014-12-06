@@ -1,0 +1,2 @@
+== Manual initialization 
+description of what you have to do at the moment to get this thing running

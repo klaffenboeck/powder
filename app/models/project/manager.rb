@@ -22,15 +22,15 @@ class Project::Manager
   end
   
   def generate_estimation_function(type = "GaussianProcessModel")
-    function = ("Estimation::Function::" + type).constantize.new(project_setting: setting)
-    function.raw_data = generate_raw_data
-    generate_input_params_list
-    function.run_list = generate_function_run_list
-    R.input_matrix = function.run_list.input_matrix
-    R.result_vector = function.run_list.result_vector
-    R.eval "output <- mlegp(input_matrix, result_vector)"
-    rd = function.raw_data
-    rd.mu = R.pull "output$mu"
+    # function = ("Estimation::Function::" + type).constantize.new(project_setting: setting)
+    # function.raw_data = generate_raw_data
+    # generate_input_params_list
+    # function.run_list = generate_function_run_list
+    # R.input_matrix = function.run_list.input_matrix
+    # R.result_vector = function.run_list.result_vector
+    # R.eval "output <- mlegp(input_matrix, result_vector)"
+    # rd = function.raw_data
+    # rd.mu = R.pull "output$mu"
   end
 
   def generate_raw_data

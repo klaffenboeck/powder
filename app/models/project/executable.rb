@@ -1,3 +1,6 @@
+# == Project::Executable
+# a method class
+
 class Project::Executable < ActiveRecord::Base
   attr_accessor :adapter
   has_many :settings, class_name: "Project::Setting"
@@ -17,11 +20,12 @@ class Project::Executable < ActiveRecord::Base
     result = adapter.execute(command, params, pos)
     return MathModel::Run.new(input_params: params, result: result, project_setting: setting) if result.is_a?(MathModel::Result)
     return MathModel::Run.new(input_params: params, emulated_points: result, project_setting: setting) if result.is_a?(PowderData::EmulatedPoints)
-    
   end
   
   private
   
+
+  # TODO must also work with adapter class, not only string
   def init_adapter
     self.adapter = adapter_string.constantize.new
   end
