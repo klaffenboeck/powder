@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141124004017) do
+ActiveRecord::Schema.define(version: 20141206230540) do
 
   create_table "estimation_functions", force: true do |t|
     t.text     "content"
@@ -31,6 +31,11 @@ ActiveRecord::Schema.define(version: 20141124004017) do
     t.text     "theta"
     t.text     "inv_var_matrix"
     t.decimal  "sig2"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "frontend_explorations", force: true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end

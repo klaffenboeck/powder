@@ -1,0 +1,13 @@
+<h1>Overview settings</h1>
+<% @project_settings.each do |project_setting| %>
+  <div>
+    <span><%= project_setting.name %></span>
+    <span>
+      <%= link_to 'Show',  project_setting_path(project_setting) %>
+    </span>
+  </div>
+
+<% end %>
+<div id="button">ajax</div>
+<div id="post">post</div>
+<%= render "inline_js" %>

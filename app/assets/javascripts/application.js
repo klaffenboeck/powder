@@ -13,4 +13,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
+//= require d3/d3.min
+//= require knockout/dist/knockout
+//= require numbers.js/src/numbers.min
 //= require_tree .

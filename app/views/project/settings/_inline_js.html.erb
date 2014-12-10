@@ -1,0 +1,5 @@
+<%= javascript_tag do %>
+  window.measured_points = <%= j @project_setting.measured_points.points.to_json %>;
+  console.log("loaded");
+<% end %>
+

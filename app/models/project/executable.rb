@@ -24,7 +24,6 @@ class Project::Executable < ActiveRecord::Base
   
   private
   
-
   # TODO must also work with adapter class, not only string
   def init_adapter
     self.adapter = adapter_string.constantize.new

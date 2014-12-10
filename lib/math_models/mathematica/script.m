@@ -22,6 +22,6 @@ SetupPowder["/Users/HappyMandi/Desktop/Programming/ror/Powder/lib/mathematica/pa
 (*sampled = SampleFourParamFunction[pidTPPdata, 0.44, -0.825, 11.49, 10.046, 0.000006313];*)
 sampled2 = SampleFourParamFunction[pidTPPdata, param1, param2, param3, param4, 0.000006313];
 (*sampled3 = SampleFourParamFunction[{{0.454, 539}}, param1, param2, param3, param4, 0.006313]*)
-retval = fourParameterFunction[0.48,-0.825,11.49,10.046,0.000006313,0.45]
-Print[Directory[]];
+(*retval = fourParameterFunction[0.48,-0.825,11.49,10.046,0.000006313,0.45]*)
+(*Print[Directory[]];*)
 Export["sampled.json",sampled2]

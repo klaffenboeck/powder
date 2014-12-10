@@ -1,9 +1,27 @@
 Rails.application.routes.draw do
+
+  namespace :project do
+  get 'settings/index'
+  end
+
+  namespace :project do
+    get 'settings/remotecall'
+    post 'settings/remotepost'
+  end
+
+  namespace :project do
+    resources :settings 
+  end
+
+  namespace :frontend do
+    resources :explorations
+  end
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
-  # root 'welcome#index'
+  root 'project/settings#index'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

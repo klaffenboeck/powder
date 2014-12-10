@@ -1,0 +1,24 @@
+<h1>Listing frontend_explorations</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="4"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @frontend_explorations.each do |project_setting| %>
+      <tr>
+        <td><%= project_setting.name %></td>
+        <td><%= link_to 'Show',  frontend_exploration_path(project_setting) %></td>
+        <td><%# link_to 'Edit', edit_frontend_exploration_path(frontend_exploration) %></td>
+        <td><%# link_to 'Destroy', frontend_exploration, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%# link_to 'New Exploration', new_frontend_exploration_path %>

@@ -2,6 +2,7 @@
   "name": "dsl-generated dependencies",
   "dependencies": {
     "d3": "latest",
-    "numbers.js": "latest"
+    "numbers.js": "latest",
+    "knockout": "latest"
   }
 }
