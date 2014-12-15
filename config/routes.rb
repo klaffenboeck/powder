@@ -4,13 +4,18 @@ Rails.application.routes.draw do
   get 'settings/index'
   end
 
-  namespace :project do
-    get 'settings/remotecall'
-    post 'settings/remotepost'
-  end
+  # namespace :project do
+  #   get 'settings/:id/remotecall'
+  #   post 'remotepost', to: "settings/:id"
+  # end
 
   namespace :project do
-    resources :settings 
+    resources :settings do
+      member do
+        get "remotecall"
+        post "remotepost"
+      end
+    end
   end
 
   namespace :frontend do

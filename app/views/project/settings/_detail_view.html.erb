@@ -1,0 +1,78 @@
+<div id="detailview-1" class="detailview">
+  <div class="detail-legend" style="margin: 0 0 15px 85px">
+  <svg height="30" width="380">
+    <line x1="35" y1="15" x2="70" y2="15" class="measured-line" stroke-width="2"/>
+    <text x="80" y="20">Measurement</text>
+    <line x1="220" y1="15" x2="255" y2="15" class="main-line" stroke-width="2"/>
+    <text x="265" y="20">Simulation</text>
+  </svg>
+  </div>
+  <div class="main"></div>
+  <div class="singles"></div>
+</div>
+
+<%= javascript_tag do %>
+  window.measured_points = <%= j @project_setting.measured_points.points.to_json %>;
+  window.data_angles = <%= j @project_setting.data_angles.angles.to_json %>;
+
+  var margin = {top: 10, right: 10, bottom: 30, left: 50},
+    width = 540 - margin.left - margin.right,
+    height = 340 - margin.top - margin.bottom;
+
+  var domainX = d3.scale.linear()
+    .domain(d3.extent(window.data_angles))
+    .range([0, width]);
+
+  var domainY = d3.scale.log()
+    .base(10)
+    .domain(d3.extent(window.measured_points))
+    .range([height, 0]);
+
+  var axisX = d3.svg.axis()
+    .scale(domainX)
+    .orient("bottom");
+
+  var axisY = d3.svg.axis()
+    .scale(domainY)
+    .orient("left");
+
+  // var mainView = d3.select("#detailview-1 .main").append("svg")
+  //   .attr("width", width + margin.left + margin.right)
+  //   .attr("height", height + margin.top + margin.bottom)
+  //   .append("g")
+  //   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // var line = getLine(window.data_angles, window.measured_points, domainX, domainY);
+
+  // mainView.append("g")
+  //   .attr("class", "x axis")
+  //   .attr("transform", "translate(0," + height + ")")
+  //   .call(axisX);
+
+  // mainView.append("g")
+  //      .attr("class", "y axis")
+  //      .call(axisY);
+
+  // var measuredPeak = mainView.selectAll(".measured-peak")
+  //   .data(new Array(window.measured_points));
+
+  // measuredPeak.enter().append("g")
+  //   .attr("class", "measured-peak")
+  //   .append("path")
+  //   .attr("class", "measured-line")
+  //   .attr("d", function(d) { return line(d); });
+
+  // mainView.selectAll(".measured-peak .measured-line")
+  //   .data(new Array(data['measurement']))
+  //   .transition().delay(10).duration(1000)
+  //   .attr("d", function(d) { return line(d); });
+
+  // function getLine(xValues, yValues, xDomain, yDomain) {
+  //   var iline = d3.svg.line()
+  //   .interpolate("basis")
+  //   .x(function(d,i) { return xDomain(xValues[i]) })
+  //   .y(function(d,i) { return yDomain(yValues[i]) });
+  //   return iline;
+  // }
+
+<% end %>

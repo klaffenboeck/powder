@@ -5,7 +5,7 @@ class Project::Manager
   extend Forwardable
   attr_accessor :setting, :raw_data, :input_params_list, :function, :function_run_list #, :executable, :measured_points, , :parameter_space, , :run_list
   
-  def_delegators :@setting, :executable, :measured_points, :parameter_space, :run_list, :estimation_function
+  def_delegators :@setting, :executable, :measured_points, :data_angles, :parameter_space, :run_list, :estimation_function
   
   class << self
     def factory(setting)
@@ -58,6 +58,10 @@ class Project::Manager
   
   def estimation_function=(func)
     setting.estimation_function = func
+  end
+
+  def get_json()
+
   end
   
 end

@@ -1,2 +1,9 @@
 <h1>Project::Settings#show</h1>
-<p>Find me in app/views/project/settings/show.html.erb</p>
+
+<% @project_setting.name %>
+
+<div id="button">ajax</div>
+<div id="post">post</div>
+<div id="navigation" style="width: 20%; height: 100%; overflow: scroll; float: left"></div>
+<%= render "inline_js" %>
+<%= render "detail_view" %>

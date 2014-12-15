@@ -5,10 +5,13 @@ class Project::SettingsController < ApplicationController
   # GET /project/settings, momentarily root
   def index
     @project_settings = Project::Setting.all
+    @testpoints = PowderData::EmulatedPoints.last
   end
 
   # GET /project/settings/{id}
   def show
+    @manager = Project::Manager.setup(@project_setting)
+    @testpoints = PowderData::EmulatedPoints.last
   end
 
   def remotecall
@@ -17,6 +20,7 @@ class Project::SettingsController < ApplicationController
 
   def remotepost
     parameters = project_setting_params
+    p params[:id]
     p parameters
     p parameters.keys
     #p params[:parameters]

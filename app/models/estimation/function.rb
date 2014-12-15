@@ -3,10 +3,12 @@ class Estimation::Function < ActiveRecord::Base
   belongs_to :project_setting, class_name: "Project::Setting"
   belongs_to :raw_data, class_name: "Estimation::RawData", dependent: :destroy
   has_one :run_list, as: :run_list_holder, class_name: "MathModel::RunList", dependent: :destroy
-  attr_accessor :input_params_list
+  attr_accessor :input_params_list, :result_vector, :corr_response, :inv_var_matrix
+  after_initialize :further_setup
 
   delegate :measured_points, :parameter_space, :adapter, to: :project_setting
-  delegate :mu, :sig2, :inv_var_matrix, :theta, to: :raw_data
+  delegate :mu, :sig2, :theta, to: :raw_data
+  delegate :input_matrix, to: :run_list
   
 
   class << self
@@ -47,6 +49,11 @@ class Estimation::Function < ActiveRecord::Base
     ipl = var_input_params_list || self.input_params_list
     rl = ipl.create_run_list(project_setting)
     self.run_list = rl
+  end
 
+  def further_setup
+    #self.input_matrix = Matrix.rows(run_list.input_matrix)
+    self.inv_var_matrix = Matrix.rows(raw_data.inv_var_matrix)
+    self.result_vector = Vector.elements(run_list.result_vector)
   end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141206230540) do
+ActiveRecord::Schema.define(version: 20141210020806) do
 
   create_table "estimation_functions", force: true do |t|
     t.text     "content"
@@ -125,8 +125,10 @@ ActiveRecord::Schema.define(version: 20141206230540) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "measured_points_id"
+    t.integer  "data_angles_id"
   end
 
+  add_index "project_settings", ["data_angles_id"], name: "index_project_settings_on_data_angles_id"
   add_index "project_settings", ["executable_id"], name: "index_project_settings_on_executable_id"
   add_index "project_settings", ["parameter_space_id"], name: "index_project_settings_on_parameter_space_id"
 

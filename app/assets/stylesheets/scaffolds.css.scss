@@ -67,3 +67,181 @@ div {
     list-style: square;
   }
 }
+
+#content{
+    margin: 2em;
+}
+
+#explorer {
+    float: left;
+    width: 700px;
+}
+
+#bottomscale {
+    padding-left: 50px;
+}
+
+canvas {
+    margin: 0;
+    padding: 0;
+    display: inline;
+    font-size: 0;
+}
+
+.webgl-row {
+    margin-bottom: 10px;
+}
+
+.detailview {
+    width: 540px;
+}
+
+.detailview .singles {
+    margin-left: 55px;
+}
+
+#explorer .spaceremover {
+    font-size: 0;
+}
+
+#explorer .scale {
+    font-size: 0.75em;
+    max-width: 200px;
+    float: left;
+}
+
+.scale.vertical {
+    width: 50px;
+    height: 200px;
+}
+
+.scale text {
+    font-size: 1em;
+}
+
+.main-line {
+    fill: none;
+    stroke: steelblue;
+}
+
+.measured-line {
+    fill: none;
+    stroke: purple;
+}
+
+
+.densityPlot {
+    padding: 0;
+    
+    margin: 0;
+    margin-right: 10px;
+    width: 200px;
+    height: 200px;
+    cursor: pointer;
+}
+
+#bottomscale .scale {
+    margin-right: 10px;
+}
+
+
+#collector {
+    float: left;
+}
+
+.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.line {
+    fill: none;
+    //stroke: steelblue;
+    stroke-width: .5px;
+    pointer-events: all;
+}
+
+.dot {
+    fill: white;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
+#lines {
+    float: right;
+}
+
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+    pointer-events: all;
+}
+
+.x.axis path {
+    display: none;
+}
+
+.line {
+    fill: none;
+    stroke-width: .5px;
+    
+}
+
+
+.sigles {
+    position: relative;
+}
+.singles .singlePeak {
+    float: left;
+}
+
+.singlePeak .line {
+    stroke: steelblue;
+}
+
+.active .line {
+    stroke: green;
+}
+
+.main svg{
+    /*background-color: #efe;*/
+}
+
+.singles svg{
+    width: 60px;
+    height: 40px;
+    border: 0.5px solid black;
+}
+
+g.peak {
+    height: 100%;
+}
+
+#detailview-1 {
+    float: right;
+  position: relative;
+}
+
+.line[data-active="true"], .line[data-hover="true"][data-active="true"]{
+    stroke: red;
+}
+
+.line[data-hover="true"] {
+    stroke: orange;
+}
+
+#detailview-1 .calculating {
+  position: absolute;
+  font-size: 60px;
+  color: green;
+  top: 45%;
+  left: 15%;
+  display: none;
+}
+/* D3 */
+
+
