@@ -8,8 +8,24 @@ class MathModel::Adapter
   ModelDirectory = "lib/math_models"
   
   # returns the constant for the model directory
-  def self.directory
-    return ModelDirectory
+  class << self
+    def directory
+      return ModelDirectory
+    end
+
+    # what type of input is needed for the adapter
+    # defaults to array, override in subclasses if necessary
+    def paramstype
+      "Array"
+    end
+
+    def inputtype
+      paramstype
+    end
+
+    def input_type
+      paramstype
+    end
   end
   
 
@@ -26,6 +42,10 @@ class MathModel::Adapter
   def systemcall(command, params)
     params = MathModel::InputParams.convert(params)
     system("./" + command + " " + params.to_s)
+  end
+
+  def paramstype
+    self.class.paramstype
   end
   
   

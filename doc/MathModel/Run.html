@@ -92,11 +92,15 @@
     
   
     
+      <dt class="r2">Includes:</dt>
+      <dd class="r2"><span class='object_link'><a href="../Serializable.html" title="Serializable (module)">Serializable</a></span></dd>
+      
+    
   
   
   
-    <dt class="r2 last">Defined in:</dt>
-    <dd class="r2 last">app/models/math_model/run.rb</dd>
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">app/models/math_model/run.rb</dd>
   
 </dl>
 <div class="clear"></div>
@@ -233,6 +237,17 @@
 
 
   
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Serializable.html" title="Serializable (module)">Serializable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Serializable.html#included-class_method" title="Serializable.included (method)">included</a></span></p>
+
+  
 
   <div id="instance_method_details" class="method_details_list">
     <h2>Instance Method Details</h2>
@@ -264,12 +279,12 @@
       <pre class="lines">
 
 
-28
 29
-30</pre>
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/math_model/run.rb', line 28</span>
+      <pre class="code"><span class="info file"># File 'app/models/math_model/run.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_calculate_quality_metric'>calculate_quality_metric</span>
   <span class='id identifier rubyid_quality_metrics'>quality_metrics</span> <span class='op'>&lt;&lt;</span> <span class='const'>PowderData</span><span class='op'>::</span><span class='const'>QualityMetric</span><span class='op'>::</span><span class='const'>Chi2</span><span class='period'>.</span><span class='id identifier rubyid_evaluate'>evaluate</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_quality_metrics'>quality_metrics</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&lt;</span> <span class='int'>1</span>
@@ -294,12 +309,12 @@
       <pre class="lines">
 
 
-23
 24
-25</pre>
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/math_model/run.rb', line 23</span>
+      <pre class="code"><span class="info file"># File 'app/models/math_model/run.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_emulated_points'>get_emulated_points</span>
   <span class='id identifier rubyid_emulated_points'>emulated_points</span><span class='period'>.</span><span class='id identifier rubyid_points'>points</span>
@@ -324,12 +339,12 @@
       <pre class="lines">
 
 
-19
 20
-21</pre>
+21
+22</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/math_model/run.rb', line 19</span>
+      <pre class="code"><span class="info file"># File 'app/models/math_model/run.rb', line 20</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_measured_points'>get_measured_points</span>
   <span class='id identifier rubyid_measured_points'>measured_points</span><span class='period'>.</span><span class='id identifier rubyid_points'>points</span>
@@ -354,12 +369,12 @@
       <pre class="lines">
 
 
-11
 12
-13</pre>
+13
+14</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/math_model/run.rb', line 11</span>
+      <pre class="code"><span class="info file"># File 'app/models/math_model/run.rb', line 12</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_input_params_obj'>input_params_obj</span>
   <span class='kw'>return</span> <span class='const'>MathModel</span><span class='op'>::</span><span class='const'>InputParams</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>params:</span> <span class='id identifier rubyid_input_params'>input_params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>params</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -384,12 +399,12 @@
       <pre class="lines">
 
 
-15
 16
-17</pre>
+17
+18</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/math_model/run.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'app/models/math_model/run.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_result_obj'>result_obj</span>
   <span class='kw'>return</span> <span class='const'>MathModel</span><span class='op'>::</span><span class='const'>Result</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>value:</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -404,7 +419,7 @@
 </div>
 
     <div id="footer">
-  Generated on Sat Dec 20 12:24:14 2014 by
+  Generated on Sat Dec 20 15:26:16 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.1.2).
 </div>

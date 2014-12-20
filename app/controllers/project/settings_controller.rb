@@ -19,15 +19,16 @@ class Project::SettingsController < ApplicationController
     render json: Project::Setting.first
   end
 
+  # currently the method to get the data into fronted via ajax
+  # should be exchanged actually for something more appropriate
+  # TODO: change name of call, add new route, delete old one (probably)
   def remotepost
     parameters = project_setting_params
     inputvals =  parameters.values.map {|v| v.to_f}
     id = params[:id].to_i
-    setting = Project::Setting.find(id)
-    manager = Project::Manager.setup(setting)
+    #setting = Project::Setting.find(id)
+    manager = Project::Manager.setup(id)
     run = manager.run(inputvals)
-    # p parameters.keys
-    # #p params[:parameters]
     render json: run.get_emulated_points.to_json
   end
 

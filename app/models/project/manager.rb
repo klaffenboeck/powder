@@ -49,6 +49,8 @@ class Project::Manager
   end
   
   def run(input_params, position = nil)
+    
+    input_params = correct_params(input_params, _type)
     executable.run(input_params, setting, position)
   end
   
@@ -62,6 +64,12 @@ class Project::Manager
 
   def get_json()
 
+  end
+
+  def correct_params(params, type = nil)
+    type = executable.paramstype if type.nil?
+    return params if params.class.to_s == type.capitalize
+    parameter_space.send("input_" + type.downcase, params)
   end
   
 end

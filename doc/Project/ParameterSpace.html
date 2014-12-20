@@ -165,7 +165,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>get the boundaries of the parameter space.</p>
+</div></span>
   
 </li>
 
@@ -188,6 +190,56 @@
 
   
     <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#input_array-instance_method" title="#input_array (instance method)">- (Object) <strong>input_array</strong>(hash) </a>
+    
+
+    
+      (also: #to_array, #to_input_array)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>create and return an ordered array with your inputs.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#keys-instance_method" title="#keys (instance method)">- (Object) <strong>keys</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>get the keys of the hash stored in content.</p>
+</div></span>
   
 </li>
 
@@ -221,6 +273,8 @@
     
 
     
+      (also: #length)
+    
   </span>
   
   
@@ -231,7 +285,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>returns the size of the parameter space.</p>
+</div></span>
   
 </li>
 
@@ -272,12 +328,12 @@
       <pre class="lines">
 
 
-3
-4
-5</pre>
+5
+6
+7</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 3</span>
+      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 5</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_json'>json</span>
   <span class='ivar'>@json</span>
@@ -303,18 +359,47 @@
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get the boundaries of the parameter space</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'>
+<p>Array of Arrays</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-17
-18
-19</pre>
+21
+22
+23</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 17</span>
+      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_boundaries'>boundaries</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span>
@@ -339,19 +424,161 @@
       <pre class="lines">
 
 
-21
-22
-23
-24
-25</pre>
+25
+26
+27
+28
+29</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 25</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_sample_points'>generate_sample_points</span><span class='lparen'>(</span><span class='id identifier rubyid_rows'>rows</span><span class='comma'>,</span> <span class='id identifier rubyid_save_raw_data'>save_raw_data</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raw_data'>raw_data</span> <span class='op'>=</span> <span class='const'>Estimation</span><span class='op'>::</span><span class='const'>RawData</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='lparen'>(</span><span class='label'>rows:</span> <span class='id identifier rubyid_rows'>rows</span><span class='comma'>,</span> <span class='label'>cols:</span> <span class='id identifier rubyid_size'>size</span><span class='rparen'>)</span>
   <span class='comment'>#raw_data.save if save_raw_data
 </span>  <span class='id identifier rubyid_map_normals'>map_normals</span><span class='lparen'>(</span><span class='id identifier rubyid_raw_data'>raw_data</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="input_array-instance_method">
+  
+    - (<tt>Object</tt>) <strong>input_array</strong>(hash) 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='to_array-instance_method'>to_array</span>, <span id='to_input_array-instance_method'>to_input_array</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>create and return an ordered array with your inputs</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>hash</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Hash</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'>
+<p>Array</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+48
+49
+50</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 48</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_input_array'>input_array</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='op'>|</span> <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="keys-instance_method">
+  
+    - (<tt>Object</tt>) <strong>keys</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>get the keys of the hash stored in content</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'>
+<p>Array of Strings</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+41
+42
+43</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 41</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_keys'>keys</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -373,18 +600,18 @@
       <pre class="lines">
 
 
-7
-8
 9
 10
 11
 12
 13
 14
-15</pre>
+15
+16
+17</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 7</span>
+      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 9</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_map_normals'>map_normals</span><span class='lparen'>(</span><span class='id identifier rubyid_raw_data'>raw_data</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_check_dims'>check_dims</span><span class='lparen'>(</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span> <span class='id identifier rubyid_raw_data'>raw_data</span><span class='period'>.</span><span class='id identifier rubyid_get_first'>get_first</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='rparen'>)</span>
@@ -407,20 +634,53 @@
   
 
   
+    <span class="aliases">Also known as:
+    <span class="names"><span id='length-instance_method'>length</span></span>
+    </span>
+  
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>returns the size of the parameter space</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'>
+<p>Fixnum</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-27
-28
-29</pre>
+33
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 27</span>
+      <pre class="code"><span class="info file"># File 'app/models/project/parameter_space.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_size'>size</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
@@ -435,7 +695,7 @@
 </div>
 
     <div id="footer">
-  Generated on Sat Dec 20 12:24:15 2014 by
+  Generated on Sat Dec 20 15:26:16 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.1.2).
 </div>

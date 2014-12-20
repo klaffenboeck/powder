@@ -63,11 +63,50 @@
 
     <div id="content"><div id='filecontents'>
 <h2 id="label-Next+steps">Next steps</h2>
-<dl class="rdoc-list label-list"><dt>manager setup
-<dd>
-<p>Der Manager sollte alleine in der Lage sein, settings zu laden, ohne die
-Settings vorher initialisieren zu muessen</p>
+
+<h3 id="label-Jsonify+run">Jsonify run</h3>
+
+<p>run muss korrektes json werden, welches vom browser / d3 einfach
+interpretiert werden kann</p>
+
+<p>Habe hier gerade den serializer erweitert, damit die serialize methode
+leichter inkludiert werden kann</p>
+
+<h3 id="label-Runlist+">Runlist </h3>
+
+<p>muss neue runs starten koennen. Beim Laden sollen diese automatisch im
+controller und in view geladen werden. Frage: welcher controller sollte das
+machen?</p>
+<dl class="rdoc-list label-list"><dt>adapt manager run
+<dd><ul><li>
+<p>manager muss sowohl arrays als auch objects lesen koennen, bevor diese an
+run geschickt werden</p>
+</li><li>
+<p>response wird an parameterspace weitergeleitet</p>
+</li></ul>
 </dd></dl>
+
+<h3 id="label-Manager+setup">Manager setup</h3>
+
+<p>Der Manager sollte alleine in der Lage sein, settings zu laden, ohne die
+Settings vorher initialisieren zu muessen (Anmerkung: war bereits erledigt)</p>
+
+<h2 id="label-Small+todos">Small todos</h2>
+<dl class="rdoc-list label-list"><dt>Change speed
+<dd>
+<p>Change the speed of the disappearing line</p>
+</dd><dt>Remove prints
+<dd>
+<p>remove all unnecessary console prints</p>
+</dd></dl>
+
+<h2 id="label-Possible+ideas">Possible ideas</h2>
+
+<h3 id="label-Estimate+on+hover">Estimate on hover</h3>
+
+<p>Anstatt einen Balken zu draggen könnte ein estimate on hover durchgefuehrt
+werden. Das event wird on click gesendet und berechnet, dragging nicht
+notwendig</p>
 
 <h2 id="label-Manual+initialization+">Manual initialization </h2>
 
@@ -75,7 +114,7 @@ Settings vorher initialisieren zu muessen</p>
 </div></div>
 
     <div id="footer">
-  Generated on Sat Dec 20 12:24:14 2014 by
+  Generated on Sat Dec 20 15:26:16 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.1.2).
 </div>

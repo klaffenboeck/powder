@@ -1,5 +1,6 @@
 class Estimation::Function < ActiveRecord::Base
   #alias_attribute :setting_id, :project_setting_id
+  include Serializable
   belongs_to :project_setting, class_name: "Project::Setting"
   belongs_to :raw_data, class_name: "Estimation::RawData", dependent: :destroy
   has_one :run_list, as: :run_list_holder, class_name: "MathModel::RunList", dependent: :destroy
@@ -57,7 +58,7 @@ class Estimation::Function < ActiveRecord::Base
     self.result_vector = Vector.elements(run_list.result_vector) if !!run_list.result_vector
   end
 
-  def serialize
-    (self.class.name + "Serializer").constantize.new(self)
-  end
+  # def serialize
+  #   (self.class.name + "Serializer").constantize.new(self)
+  # end
 end

@@ -92,11 +92,15 @@
     
   
     
+      <dt class="r2">Includes:</dt>
+      <dd class="r2"><span class='object_link'><a href="../Serializable.html" title="Serializable (module)">Serializable</a></span></dd>
+      
+    
   
   
   
-    <dt class="r2 last">Defined in:</dt>
-    <dd class="r2 last">app/models/estimation/function.rb</dd>
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">app/models/estimation/function.rb</dd>
   
 </dl>
 <div class="clear"></div>
@@ -362,31 +366,20 @@
 </li>
 
       
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#serialize-instance_method" title="#serialize (instance method)">- (Object) <strong>serialize</strong> </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
     </ul>
   
 
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Serializable.html" title="Serializable (module)">Serializable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Serializable.html#included-class_method" title="Serializable.included (method)">included</a></span></p>
 
   
   <div id="instance_attr_details" class="attr_details">
@@ -420,12 +413,12 @@
       <pre class="lines">
 
 
-6
 7
-8</pre>
+8
+9</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 6</span>
+      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 7</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_corr_response'>corr_response</span>
   <span class='ivar'>@corr_response</span>
@@ -463,12 +456,12 @@
       <pre class="lines">
 
 
-6
 7
-8</pre>
+8
+9</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 6</span>
+      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 7</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_input_params_list'>input_params_list</span>
   <span class='ivar'>@input_params_list</span>
@@ -506,12 +499,12 @@
       <pre class="lines">
 
 
-6
 7
-8</pre>
+8
+9</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 6</span>
+      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 7</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inv_var_matrix'>inv_var_matrix</span>
   <span class='ivar'>@inv_var_matrix</span>
@@ -549,12 +542,12 @@
       <pre class="lines">
 
 
-6
 7
-8</pre>
+8
+9</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 6</span>
+      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 7</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_result_vector'>result_vector</span>
   <span class='ivar'>@result_vector</span>
@@ -586,7 +579,6 @@
       <pre class="lines">
 
 
-15
 16
 17
 18
@@ -606,10 +598,11 @@
 32
 33
 34
-35</pre>
+35
+36</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_factory'>factory</span><span class='lparen'>(</span><span class='id identifier rubyid_setting'>setting</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_func'>func</span> <span class='op'>=</span> <span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>project_setting:</span> <span class='id identifier rubyid_setting'>setting</span><span class='rparen'>)</span>
@@ -658,14 +651,14 @@
       <pre class="lines">
 
 
-54
 55
 56
 57
-58</pre>
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 55</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_further_setup'>further_setup</span>
   <span class='comment'>#self.input_matrix = Matrix.rows(run_list.input_matrix)
@@ -692,14 +685,14 @@
       <pre class="lines">
 
 
-42
 43
 44
 45
-46</pre>
+46
+47</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_input_params_list'>generate_input_params_list</span><span class='lparen'>(</span><span class='id identifier rubyid_input_raw_data'>input_raw_data</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_rd'>rd</span> <span class='op'>=</span> <span class='id identifier rubyid_input_raw_data'>input_raw_data</span> <span class='op'>||</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_raw_data'>raw_data</span>
@@ -726,12 +719,12 @@
       <pre class="lines">
 
 
-38
 39
-40</pre>
+40
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_raw_data'>generate_raw_data</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_raw_data'>raw_data</span> <span class='op'>=</span> <span class='const'>Estimation</span><span class='op'>::</span><span class='const'>RawData</span><span class='period'>.</span><span class='id identifier rubyid_factory'>factory</span><span class='lparen'>(</span><span class='label'>cols:</span> <span class='id identifier rubyid_parameter_space'>parameter_space</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span> <span class='label'>rows:</span> <span class='id identifier rubyid_project_setting'>project_setting</span><span class='period'>.</span><span class='id identifier rubyid_accuracy'>accuracy</span><span class='rparen'>)</span>
@@ -756,14 +749,14 @@
       <pre class="lines">
 
 
-48
 49
 50
 51
-52</pre>
+52
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_run_list'>generate_run_list</span><span class='lparen'>(</span><span class='id identifier rubyid_var_input_params_list'>var_input_params_list</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_ipl'>ipl</span> <span class='op'>=</span> <span class='id identifier rubyid_var_input_params_list'>var_input_params_list</span> <span class='op'>||</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_input_params_list'>input_params_list</span>
@@ -775,42 +768,12 @@
 </table>
 </div>
     
-      <div class="method_details ">
-  <h3 class="signature " id="serialize-instance_method">
-  
-    - (<tt>Object</tt>) <strong>serialize</strong> 
-  
-
-  
-
-  
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-60
-61
-62</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'app/models/estimation/function.rb', line 60</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_serialize'>serialize</span>
-  <span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Serializer</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_constantize'>constantize</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
   </div>
 
 </div>
 
     <div id="footer">
-  Generated on Sat Dec 20 12:24:14 2014 by
+  Generated on Sat Dec 20 15:26:16 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.1.2).
 </div>

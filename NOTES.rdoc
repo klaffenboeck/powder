@@ -1,5 +1,29 @@
 == Next steps
-[manager setup] Der Manager sollte alleine in der Lage sein, settings zu laden, ohne die Settings vorher initialisieren zu muessen
+
+=== Very next step: map via ParameterSpace
+
+=== Jsonify run
+run muss korrektes json werden, welches vom browser / d3 einfach interpretiert werden kann
+
+Habe hier gerade den serializer erweitert, damit die serialize methode leichter inkludiert werden kann
+
+=== Runlist 
+muss neue runs starten koennen. Beim Laden sollen diese automatisch im controller und in view geladen werden. Frage: welcher controller sollte das machen?
+
+[adapt manager run] 
+  * manager muss sowohl arrays als auch objects lesen koennen, bevor diese an run geschickt werden
+  * response wird an parameterspace weitergeleitet
+
+=== Manager setup
+Der Manager sollte alleine in der Lage sein, settings zu laden, ohne die Settings vorher initialisieren zu muessen (Anmerkung: war bereits erledigt)
+
+== Small todos
+[Change speed] Change the speed of the disappearing line
+[Remove prints] remove all unnecessary console prints
+
+== Possible ideas
+=== Estimate on hover
+Anstatt einen Balken zu draggen könnte ein estimate on hover durchgefuehrt werden. Das event wird on click gesendet und berechnet, dragging nicht notwendig
 
 == Manual initialization 
 description of what you have to do at the moment to get this thing running
