@@ -49,8 +49,7 @@ class Project::Manager
   end
   
   def run(input_params, position = nil)
-    
-    input_params = correct_params(input_params, _type)
+    input_params = correct_params(input_params)
     executable.run(input_params, setting, position)
   end
   

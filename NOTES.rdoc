@@ -1,6 +1,6 @@
 == Next steps
 
-=== Very next step: map via ParameterSpace
+=== Very next step: jsonify run
 
 === Jsonify run
 run muss korrektes json werden, welches vom browser / d3 einfach interpretiert werden kann

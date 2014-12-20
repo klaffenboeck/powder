@@ -47,7 +47,7 @@ class @Navigation
           parameters: @current_x_values()
       ).done (json) ->
         window.previous_line.valuesY = window.emulated_points.valuesY
-        window.emulated_points.valuesY = json
+        window.emulated_points.valuesY = json.run.emulated_points.points
         window.error_line.setDifference(window.measured_points, window.emulated_points)
         window.change_line.setDifference(window.emulated_points, window.previous_line)
         window.linechart.drawLines()

@@ -24,12 +24,14 @@ class Project::SettingsController < ApplicationController
   # TODO: change name of call, add new route, delete old one (probably)
   def remotepost
     parameters = project_setting_params
-    inputvals =  parameters.values.map {|v| v.to_f}
+    # inputvals =  parameters.values.map {|v| v.to_f}
+    inputvals = parameters
     id = params[:id].to_i
     #setting = Project::Setting.find(id)
     manager = Project::Manager.setup(id)
     run = manager.run(inputvals)
-    render json: run.get_emulated_points.to_json
+    #render json: run.get_emulated_points.to_json
+    render json: run
   end
 
   private 

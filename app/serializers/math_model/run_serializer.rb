@@ -1,3 +1,3 @@
 class MathModel::RunSerializer < ActiveModel::Serializer
-  attributes :id
+  attributes :id, :quality_metrics, :emulated_points
 end

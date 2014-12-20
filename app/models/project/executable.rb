@@ -18,15 +18,14 @@ class Project::Executable < ActiveRecord::Base
   end
   
   def run(params, setting = nil, pos = nil)
-    params = correct_params(params)
     result = adapter.execute(command, params, pos)
     return MathModel::Run.new(input_params: params, result: result, project_setting: setting) if result.is_a?(MathModel::Result)
     return MathModel::Run.new(input_params: params, emulated_points: result, project_setting: setting) if result.is_a?(PowderData::EmulatedPoints)
   end
   
-  def correct_params
-    adapter
-  end
+  # def correct_params
+  #   adapter
+  # end
 
 
   private

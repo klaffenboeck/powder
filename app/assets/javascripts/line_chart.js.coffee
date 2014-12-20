@@ -277,7 +277,7 @@ class @Display
   removeLine: (line) =>
     @view.selectAll("." + line.name)
     .data([]).exit()
-    .transition().delay(10).duration(500)
+    .transition().delay(0).duration(350)
     .style("opacity", 0)
     .remove()
 
