@@ -53,7 +53,11 @@ class Estimation::Function < ActiveRecord::Base
 
   def further_setup
     #self.input_matrix = Matrix.rows(run_list.input_matrix)
-    self.inv_var_matrix = Matrix.rows(raw_data.inv_var_matrix)
-    self.result_vector = Vector.elements(run_list.result_vector)
+    self.inv_var_matrix = Matrix.rows(raw_data.inv_var_matrix) if !!raw_data.inv_var_matrix
+    self.result_vector = Vector.elements(run_list.result_vector) if !!run_list.result_vector
+  end
+
+  def serialize
+    (self.class.name + "Serializer").constantize.new(self)
   end
 end

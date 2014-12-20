@@ -92,13 +92,13 @@ canvas {
     margin-bottom: 10px;
 }
 
-.detailview {
-    width: 540px;
-}
+// .detailview {
+//     width: 540px;
+// }
 
-.detailview .singles {
-    margin-left: 55px;
-}
+// .detailview .singles {
+//     margin-left: 55px;
+// }
 
 #explorer .spaceremover {
     font-size: 0;
@@ -244,4 +244,20 @@ g.peak {
 }
 /* D3 */
 
+.overlay {
+  //fill: none;
+  opacity: 0.01;
+  pointer-events: all;
+}
+
+#navigation {
+  width: 20%;
+  height: 600px;
+  overflow: scroll;
+  float: left;
+}
+
+.muted {
+  opacity: 0.5
+}
 

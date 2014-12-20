@@ -12,6 +12,7 @@ class Project::SettingsController < ApplicationController
   def show
     @manager = Project::Manager.setup(@project_setting)
     @testpoints = PowderData::EmulatedPoints.last
+    @function = @project_setting.estimation_function.serialize.as_json
   end
 
   def remotecall
@@ -20,11 +21,14 @@ class Project::SettingsController < ApplicationController
 
   def remotepost
     parameters = project_setting_params
-    p params[:id]
-    p parameters
-    p parameters.keys
-    #p params[:parameters]
-    render json: Project::Setting.first
+    inputvals =  parameters.values.map {|v| v.to_f}
+    id = params[:id].to_i
+    setting = Project::Setting.find(id)
+    manager = Project::Manager.setup(setting)
+    run = manager.run(inputvals)
+    # p parameters.keys
+    # #p params[:parameters]
+    render json: run.get_emulated_points.to_json
   end
 
   private 

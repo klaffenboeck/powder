@@ -26,23 +26,62 @@ class @Legend
     _entries =
       @legend.selectAll(".legend-entry")
         .data(@entries)
-    _entries
-      .enter()
+    _enteries = _entries.enter()
       .append("g")
-      .attr("class","legend-entry")
+      .attr("class", (d) ->
+        "legend-entry " + d.name )
+      .on("click", (d, i) =>
+        d.toggle()
+        @drawEntries()
+        window.linechart.drawLines() # this has to be exchanged
+      )
       .attr("transform", @getTranslate)
+    _enteries
       .append("rect")
+      .attr("class", "legend-color")
       .attr("width", 10)
       .attr("height", 10)
       .style("fill", @getColor)
       .style("stroke", @getColor)
-    _entries
-      .append("text")
+    _enteries
+      .insert("text")
       .attr('x', @lineHeight)
-      .attr('y', @lineHeight/2)
+      .attr('y', @lineHeight / 2)
       .text( (d) ->
         d.name
       )
+
+    _entries
+      .classed("muted", (d) ->
+        d.muted()
+      )
+
+    _new_entries =       
+      d3.selectAll(".legend-entry").selectAll("text")
+
+    _new_entries
+      .data((d) ->
+        d
+      )
+      .attr("class","text")
+      # .enter()
+      # .each( (d) ->
+      #   console.log(@)
+      #   console.log(d)
+      # )
+      # .data(@entries)
+      # # .data( (d) ->
+      # #   console.log(d)
+      # #   return d
+      # # )
+      # .enter()
+      # .append("text")
+      # .attr('x', @lineHeight)
+      # .attr('y', @lineHeight/2)
+      # .text( (d) ->
+      #   d.name
+      # )
+    
 
 
   getTranslate: (data, index) =>
