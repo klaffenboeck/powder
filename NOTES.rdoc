@@ -1,2 +1,5 @@
+== Next steps
+[manager setup] Der Manager sollte alleine in der Lage sein, settings zu laden, ohne die Settings vorher initialisieren zu muessen
+
 == Manual initialization 
 description of what you have to do at the moment to get this thing running
