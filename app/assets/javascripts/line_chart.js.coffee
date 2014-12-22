@@ -50,7 +50,7 @@ class @NavChart extends Chart
     @set_default_boundaries() if not @boundaries
     @calc_ticks() if not @ticks
     @axisX = new Axis({domain: @domain, ticks: @ticks})
-    @axisY = new Axis({domain: @quality})
+    @axisY = new KAxis({domain: @quality})
     @display = new Display
       select: "#navigation"
       boundaries: @boundaries
@@ -175,10 +175,19 @@ class @Axis
       d3.svg.axis()
         .scale(@domain.domain)
         .ticks(@ticks)
-        .orient(@orientation);
+        .orient(@orientation)
+        .tickFormat(@k_format);
 
   value_at: (position) =>
     @domain.value_at(position)
+
+
+class @KAxis extends Axis
+  constructor: (options={}) ->
+    super(options)
+    @k_format = d3.format("s")
+    @axis.tickFormat(@k_format)
+
 
 
 
