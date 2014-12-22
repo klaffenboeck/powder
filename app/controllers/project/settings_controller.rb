@@ -18,7 +18,6 @@ class Project::SettingsController < ApplicationController
   def remotecall
     @setting = Project::Setting.find(params[:id])
     render json: @setting
-
   end
 
   # currently the method to get the data into fronted via ajax
@@ -30,6 +29,7 @@ class Project::SettingsController < ApplicationController
     id = params[:id].to_i
     manager = Project::Manager.setup(id)
     run = manager.run(inputvals)
+    manager.run_list.add(run)
     #render json: run.get_emulated_points.to_json
     render json: run
   end
