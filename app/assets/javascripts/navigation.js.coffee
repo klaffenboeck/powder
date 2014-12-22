@@ -15,30 +15,29 @@ class @Navigation
     @charts = {}
     @value_arrays = {}
     @current_values = {}
+    @preview_color = new Color("red")
     for key, range of @parameter_space
       _domain = new Domain({name: key, range: range, width: @boundaries.width })
       _chart = new NavChart({boundaries: @boundaries, quality: @quality, domain: _domain, name: key })
-      @value_arrays[key] = _domain.width_to_values()
+      @value_arrays[key] = _domain.width_to_values(10)
       @setup_mousedown(_chart)
-      #_chart.display.overlay.on("mousedown", _chart.mousedown)
-      #_chart.display.overlay.on("mousedown", @mousedown)
-      _line = new Line({name: key, domainY: @quality, domainX: _domain, valuesX: @value_arrays[key]})
+      _line = new EstLine({name: key, key: key, domainY: @quality, domainX: _domain, valuesX: @value_arrays[key]})
+      _preview_line = new EstLine({name: key + "-preview", key: key, domainY: @quality, domainX: _domain, valuesX: @value_arrays[key], color: @preview_color})
+      _preview_line.hide()
       _chart.addLine(_line)
+      _chart.addLine(_preview_line)
       _curr = @current_position
-
       @charts[key] = _chart
 
   mousedown: (options) ->
     console.log(this)
 
   setup_mousedown: (chart) =>
-
     _chart = chart
+    _overlay = chart.display.overlay
     chart.display.overlay.on("mousedown", =>
       _chart.mousedown()
       @estimate_all_lines()
-      console.log(@current_positions())
-      console.log(@current_x_values("array"))
       $.ajax(
         url: document.URL + "/remotepost"
         cache: false
@@ -46,18 +45,26 @@ class @Navigation
         data:
           parameters: @current_x_values()
       ).done (json) ->
-        window.previous_line.valuesY = window.emulated_points.valuesY
-        window.emulated_points.valuesY = json.run.emulated_points.points
-        window.error_line.setDifference(window.measured_points, window.emulated_points)
-        window.change_line.setDifference(window.emulated_points, window.previous_line)
-        window.linechart.drawLines()
-        return
+        window.manager.updateLineChart(json)
+      )
+    _overlay.on("mouseover", =>
+      @show_preview_lines()
+      @fixed_hover = @current_x_values()
+    )
+    _overlay.on("mousemove", =>
+      _value = _chart.mouseover()
+      # console.log(_chart.currX(_value))
+      @estimate_preview(_chart.name, _chart.currX(_value))
+    )
+    _overlay.on("mouseout", =>
+      @hide_preview_lines()
+      @fixed_hover = null
     )
 
   set_default_boundaries: =>
     @boundaries = new Boundaries
-      width: 200
-      height: 200
+      width: 100
+      height: 100
       margin:
         bottom: 60
         left: 60
@@ -85,10 +92,12 @@ class @Navigation
   estimate_line: (line, fixed) =>
     _params = {}
     _keys = Object.keys(fixed)
-    _samplekey = line.name
+    _samplekey = line.key
     for key in _keys
       _params[key] = fixed[key]
-    _values = line.valuesX
+    _values = []
+    for val, i in line.valuesX
+      _values.push(val)
     _retval = []
     for value in _values
       _params[_samplekey] = value
@@ -98,13 +107,37 @@ class @Navigation
   estimate_all_lines: =>
     _start = Date.now()
     _fixed = @current_x_values()
+    console.log("FIXED")
+    console.log(_fixed)
     for key, chart of @charts
       _line = chart.getLines()[key]
       _line.valuesY = @estimate_line(_line, _fixed)
-      chart.drawLines()
+      chart.drawLine(_line)
     _end = Date.now()
-    console.log(_end - _start)
+    console.log("TIME: " + (_end - _start))
 
+  estimate_preview: (key = null, value = null)=>
+    _fixed = @current_x_values()
+    _fixed[key] = value if key and value
+    for key, chart of @charts
+      _line = chart.getLines()[key + "-preview"]
+      _line.valuesY = @estimate_line(_line, _fixed)
+      chart.drawLine(_line, 5)
+
+  show_preview_lines: =>
+    _start = Date.now()
+    for key, chart of @charts
+      _line = chart.getLines()[key + "-preview"]
+      _line.show()
+      chart.drawLine(_line, 0)
+    _end = Date.now()
+    console.log("TIME: " + (_end - _start))
+
+  hide_preview_lines: =>
+    for key, chart of @charts
+      _line = chart.getLines()[key + "-preview"]
+      _line.hide()
+      chart.drawLine(_line, 0)
 
 
 

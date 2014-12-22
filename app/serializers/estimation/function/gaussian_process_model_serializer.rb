@@ -8,4 +8,5 @@ class Estimation::Function::GaussianProcessModelSerializer < ActiveModel::Serial
   def parameter_space
     object.parameter_space.content
   end
+
 end

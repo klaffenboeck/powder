@@ -33,7 +33,7 @@ class @Legend
       .on("click", (d, i) =>
         d.toggle()
         @drawEntries()
-        window.linechart.drawLines() # this has to be exchanged
+        window.m.linechart.drawLines() # this has to be exchanged
       )
       .attr("transform", @getTranslate)
     _enteries

@@ -9,6 +9,9 @@ class @Chart
   drawLines: =>
     @display.drawLines()
 
+  drawLine: (line, dur) =>
+    @display.drawLine(line, dur)
+
   getLines: =>
     @display.lines
 
@@ -59,7 +62,7 @@ class @NavChart extends Chart
     # )
     @_current_position = options.startposition ? 10
     @current_x_value = @currX   #alias function
-    @_x_values = @get_all_x_values()
+    @_x_values = @get_all_x_values(10)
     svg = d3.select("#navigation").selectAll("." + @name)
     svg.append("text")
       .data([@name])
@@ -93,20 +96,23 @@ class @NavChart extends Chart
     return @_current_position if position == null
     @_current_position = position
 
-  currX: =>
-    @domain.value_at(@current_position())
+  currX: (pos = null) =>
+    position = pos ? @current_position()
+    @domain.value_at(position)
 
   get_all_x_values: =>
-    @_x_values ? @domain.width_to_values()
+    @_x_values ? @domain.width_to_values(10)
 
   mousedown: (d,i) ->
-    console.log(@)
-    console.log("d: " + d)
-    console.log(i)
     _overlay = @display.overlay[0][0]
-    #_overlay = display.overlay[0][0]
     @current_position(d3.mouse(_overlay)[0])
     console.log(@current_position())
+
+  mouseover: ->
+    _overlay = @display.overlay[0][0]
+    return d3.mouse(_overlay)[0]
+    #@current_hover_position()
+
 
 class @Domain
   constructor: (options={}) ->
@@ -134,10 +140,11 @@ class @Domain
   value_at: (position) =>
     @rangeband.invert(position)
 
-  width_to_values: =>
+  width_to_values: (modulo = 1)=>
     _values = []
     for i in [0..@width]
-      _values.push(@value_at(i))
+      if i % modulo == 0
+        _values.push(@value_at(i))
     return _values
 
 
@@ -233,11 +240,17 @@ class @Display
       .attr("class", "y axis")
       .call(@yAxis.axis);
 
-  track_mouse: =>
+  track_mouse: (value) =>
     _axis = @xAxis
-    @overlay.on("mousemove", ->
-      console.log(d3.mouse(this)[0])
-    )
+    # @overlay.on("mousemove", ->
+    #   console.log("display")
+    #   console.log(this)
+    #   # value = d3.mouse(this)[0]s
+    #   # console.log(value)
+    #   # console.log("outside")
+    #   # return
+    # )
+
 
   stop_tracking: =>
     @overlay.on("mousemove", null)
@@ -251,7 +264,7 @@ class @Display
       line = @lines[key]
       @drawLine(line)
 
-  drawLine: (line) =>
+  drawLine: (line, dur = 750) =>
     return_function = (d) ->
       line.line(d)
     base =
@@ -270,14 +283,14 @@ class @Display
 
     @view.selectAll(line.fullClassSpecifier())
       .data(new Array(line.valuesY))
-      .transition().delay(10).duration(750)
+      .transition().delay(1).duration(dur)
       .style("opacity", line._opacity())
       .attr("d", return_function)
 
   removeLine: (line) =>
     @view.selectAll("." + line.name)
     .data([]).exit()
-    .transition().delay(0).duration(350)
+    .transition().delay(0).duration(500)
     .style("opacity", 0)
     .remove()
 
@@ -348,8 +361,11 @@ class @Line
       when false then 0
 
 class @DiffLine extends Line
-  constructor: ->
-    super
+  constructor: (options={}) ->
+    super(options)
+    @line1 = options.line1
+    @line2 = options.line2
+    #@valuesY = @calcDifference
 
   setDifference: (line1, line2, with_offset = true) =>
     diff = DiffLine.difference(line1, line2, with_offset)
@@ -362,9 +378,17 @@ class @DiffLine extends Line
    
     newValues = []
     for value, index in line1.valuesY
-      newValues.push(Math.abs(value - values2[index]) / 10)
+      newValues.push(Math.abs(value - values2[index]))
     newValues
 
+  calcDifference: =>
+    @setDifference(@line1, @line2)
+
+
+class @EstLine extends Line
+  constructor: (options = {}) ->
+    super(options)
+    @key = options.key
 
 class @Color
   constructor: (options={}) ->
@@ -373,6 +397,8 @@ class @Color
 
   getColor: (string) ->
     d3.rgb(string)
+
+
 
 
 
