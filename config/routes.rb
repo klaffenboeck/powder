@@ -13,6 +13,7 @@ Rails.application.routes.draw do
     resources :settings do
       member do
         get "remotecall"
+        get "get_runs"
         post "remotepost"
       end
     end

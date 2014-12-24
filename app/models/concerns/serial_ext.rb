@@ -1,4 +1,4 @@
-module Serializable
+module SerialExt
   # extend ActiveSupport::Concern
   module ClassMethods
     

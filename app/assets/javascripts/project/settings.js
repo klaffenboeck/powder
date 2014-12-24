@@ -1,4 +1,5 @@
-$( document ).ready(function() {
+var ready;
+ready = function() {
   $.ajax({
     url: document.URL + "/remotecall",
     cache: false
@@ -7,6 +8,15 @@ $( document ).ready(function() {
     console.log(json["setting"]);
     window.manager = new Manager(json["setting"]);
     window.m = window.manager
+  });
+  $.ajax({
+    url: document.URL + "/get_runs",
+    cache: false
+  })
+  .done(function( json ) {
+    window.m.runs = json
+    window.m.hist = new History({runs: m.runs.runs})
+    window.m.hist.render()
   });
   // $("#post").click(function() {
   //   $.ajax({
@@ -20,4 +30,7 @@ $( document ).ready(function() {
   //     window.ajax_value = json;
   //   });
   // });
-});
+};
+
+$(document).ready(ready);
+$(document).on('page:load', ready);

@@ -2,6 +2,8 @@ require "forwardable"
 
 class Project::Manager
   include ActiveModel::Model
+  include ActiveModel::SerializerSupport
+  include SerialExt
   extend Forwardable
   attr_accessor :setting, :raw_data, :input_params_list, :function, :function_run_list #, :executable, :measured_points, , :parameter_space, , :run_list
   
@@ -12,9 +14,6 @@ class Project::Manager
       setting = Project::Setting.find(setting) if setting.is_a?(Fixnum)
       manager = new
       manager.setting = setting
-      # manager.executable = setting.executable
-      # manager.measured_points = setting.measured_points
-      # manager.parameter_space = setting.parameter_space
       manager
     end
     

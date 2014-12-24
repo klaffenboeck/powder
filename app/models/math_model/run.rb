@@ -1,5 +1,5 @@
 class MathModel::Run < ActiveRecord::Base
-  include Serializable
+  include SerialExt
   belongs_to :project_setting, class_name: "Project::Setting"
   belongs_to :run_list, class_name: "MathModel::RunList"
   has_many :quality_metrics, class_name: "PowderData::QualityMetric", foreign_key: "math_model_run_id"

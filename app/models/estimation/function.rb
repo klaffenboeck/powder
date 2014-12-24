@@ -1,6 +1,6 @@
 class Estimation::Function < ActiveRecord::Base
   #alias_attribute :setting_id, :project_setting_id
-  include Serializable
+  include SerialExt
   belongs_to :project_setting, class_name: "Project::Setting"
   belongs_to :raw_data, class_name: "Estimation::RawData", dependent: :destroy
   has_one :run_list, as: :run_list_holder, class_name: "MathModel::RunList", dependent: :destroy

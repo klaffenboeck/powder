@@ -15,6 +15,8 @@ class @Chart
   getLines: =>
     @display.lines
 
+
+
 class @LineChart extends Chart
   constructor: (options={}) ->
     boundaries = new Boundaries
@@ -27,7 +29,7 @@ class @LineChart extends Chart
       total_height: 380
     @stepsX = options.stepsX ? data_angles
     @domainX = new Domain
-      range: data_angles
+      range: @stepsX
       width: boundaries.width
     @domainY = new Domain
       range: measured_points
@@ -44,6 +46,7 @@ class @LineChart extends Chart
     @lines = []
 
 
+
 class @NavChart extends Chart
   constructor: (options) ->
     {@ticks, @boundaries, @domain, @quality, @name} = options
@@ -57,9 +60,7 @@ class @NavChart extends Chart
       xAxis: @axisX
       yAxis: @axisY
       name: @name
-    # @domain.rangeband.on("mousemove", ->
-    #   console.log(d3.mouse(this))
-    # )
+
     @_current_position = options.startposition ? 10
     @current_x_value = @currX   #alias function
     @_x_values = @get_all_x_values(10)
@@ -83,7 +84,6 @@ class @NavChart extends Chart
         right: 20
 
   calc_ticks: =>
-    
     r = @domain.range
     t = "a" + r[0] + r[1] # convert to text and get length of text
     l = t.length - 1
@@ -112,6 +112,18 @@ class @NavChart extends Chart
     _overlay = @display.overlay[0][0]
     return d3.mouse(_overlay)[0]
     #@current_hover_position()
+
+
+
+class @MiniChart extends Chart
+  constructor: (options={}) ->
+    {@boundaries, @domainX, @domainY, @axisX, @axisY, @select} = options
+    @display = new BaseDisplay
+      boundaries: @boundaries
+      xAxis: @axisX
+      yAxis: @axisY
+      select: @select
+
 
 
 class @Domain
@@ -146,6 +158,7 @@ class @Domain
       if i % modulo == 0
         _values.push(@value_at(i))
     return _values
+
 
 
 class @Boundaries
@@ -190,14 +203,13 @@ class @KAxis extends Axis
 
 
 
-
-class @Display
+class @BaseDisplay
   constructor: (options={}) ->
     {@select, @boundaries, @xAxis, @yAxis} = options
     @name = options.name ? "undeclared"
     @lines = {}
     @setup()
-    @create()
+    # @create() 
     
   setup: ->
     b = @boundaries
@@ -224,13 +236,6 @@ class @Display
           b.margin.left + "," +
           b.margin.top + ")");
 
-
-    # _overlay = @overlay
-    # @overlay.on("mousedown", @track_mouse)
-    # _overlay.on("mouseup", @stop_tracking)
-    # d3.select(window).on("mouseup", ->
-    #   _overlay.on("mousemove", null)
-    # )
     @brush = d3.svg.brush()
       .x(@xAxis.domain.rangeband)
       .extent([0,0])
@@ -238,7 +243,7 @@ class @Display
         console.log("brushed")
       )
 
-  create: =>
+  drawAxis: =>
     @view.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + @boundaries.height + ")")
@@ -251,14 +256,7 @@ class @Display
 
   track_mouse: (value) =>
     _axis = @xAxis
-    # @overlay.on("mousemove", ->
-    #   console.log("display")
-    #   console.log(this)
-    #   # value = d3.mouse(this)[0]s
-    #   # console.log(value)
-    #   # console.log("outside")
-    #   # return
-    # )
+
 
 
   stop_tracking: =>
@@ -303,6 +301,10 @@ class @Display
     .style("opacity", 0)
     .remove()
 
+class @Display extends BaseDisplay
+  constructor: (options) ->
+    super(options)
+    @drawAxis()
 
 
 class @Line
@@ -368,6 +370,20 @@ class @Line
     switch @_show
       when true then 1
       when false then 0
+
+  copy: (options={}) =>
+    # copy = $.extend({}, @)
+    copy = {}
+    attributes = Object.keys(@)
+    for key in attributes
+      copy[key] = options[key] ? @[key]
+    return copy
+
+  deepCopy: (options={}) =>
+    copy = $.extend(true, {}, @)
+    for key, value of options
+      copy[key] = value
+    return copy
 
 class @DiffLine extends Line
   constructor: (options={}) ->

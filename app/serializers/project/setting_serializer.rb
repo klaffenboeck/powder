@@ -7,15 +7,11 @@ class Project::SettingSerializer < ActiveModel::Serializer
     :measured_points, 
     :data_angles, 
     :run_list, 
-    :runs,
     :estimation_function
 
-  def runs
-    object.run_list.runs
-  end
+  # has_many :runs, through: :run_list
 
   def estimation_function
     object.estimation_function.serialize
-    
   end
 end

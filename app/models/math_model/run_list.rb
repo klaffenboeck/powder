@@ -1,6 +1,7 @@
 require 'forwardable'
 
 class MathModel::RunList < ActiveRecord::Base
+  include SerialExt
   belongs_to :run_list_holder, polymorphic: true
   has_many :runs, class_name: "MathModel::Run", dependent: :destroy
   
@@ -25,7 +26,6 @@ class MathModel::RunList < ActiveRecord::Base
   
   def_delegators :@runs, :length, :size, :each, :each_with_index, :map, :collect # , :[], :first, :last
   
-  
   def add(run)
     raise Exceptions::TypeMismatch if !run.is_a?(MathModel::Run)
     self.runs << run
@@ -33,7 +33,6 @@ class MathModel::RunList < ActiveRecord::Base
 
   def input_matrix
     arr = runs.map do |run|
-      #byebug
       run.input_params.respond_to?(:params) ? run.input_params.params : run.input_params["params"]
     end
     Matrix.rows(arr)

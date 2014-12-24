@@ -34,6 +34,12 @@ class Project::SettingsController < ApplicationController
     render json: run
   end
 
+  def get_runs
+    manager = Project::Manager.setup(params[:id].to_i)
+    runs = manager.run_list.runs
+    render json: runs, root: "runs"
+  end
+
   private 
 
   def set_project_setting
