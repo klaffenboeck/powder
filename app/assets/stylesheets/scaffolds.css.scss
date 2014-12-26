@@ -250,12 +250,14 @@ g.peak {
   pointer-events: all;
 }
 
-#navigation {
+#navigation, #comparison {
   width: 20%;
   height: 600px;
   overflow: scroll;
   float: left;
 }
+
+
 
 .muted {
   opacity: 0.5

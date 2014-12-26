@@ -45,7 +45,9 @@ class @Navigation
         data:
           parameters: @current_x_values()
       ).done (json) ->
-        window.manager.updateLineChart(json)
+        window.m.hist.createRun(json.run)
+        window.m.hist.render()
+        window.manager.updateLineChart(json.run)
       )
     _overlay.on("mouseover", =>
       @show_preview_lines()
@@ -105,33 +107,36 @@ class @Navigation
     _retval
 
   estimate_all_lines: =>
-    _start = Date.now()
+    # _start = Date.now()
     _fixed = @current_x_values()
-    console.log("FIXED")
-    console.log(_fixed)
     for key, chart of @charts
       _line = chart.getLines()[key]
       _line.valuesY = @estimate_line(_line, _fixed)
       chart.drawLine(_line)
-    _end = Date.now()
-    console.log("TIME: " + (_end - _start))
+    # _end = Date.now()
+    # console.log("TIME: " + (_end - _start))
 
-  estimate_preview: (key = null, value = null)=>
+  estimate_preview: (key = null, value = null) =>
     _fixed = @current_x_values()
     _fixed[key] = value if key and value
+    if key instanceof Array
+      keys = Object.keys(_fixed)
+      for k, i in keys
+        _fixed[k] = key[i]
     for key, chart of @charts
       _line = chart.getLines()[key + "-preview"]
       _line.valuesY = @estimate_line(_line, _fixed)
-      chart.drawLine(_line, 5)
+      chart.drawLine(_line, 50)
+
 
   show_preview_lines: =>
-    _start = Date.now()
+    # _start = Date.now()
     for key, chart of @charts
       _line = chart.getLines()[key + "-preview"]
       _line.show()
       chart.drawLine(_line, 0)
-    _end = Date.now()
-    console.log("TIME: " + (_end - _start))
+    # _end = Date.now()
+    # console.log("TIME: " + (_end - _start))
 
   hide_preview_lines: =>
     for key, chart of @charts

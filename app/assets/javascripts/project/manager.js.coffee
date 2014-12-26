@@ -60,9 +60,9 @@ class @Manager
       line2: line2
     @linechart.display.addLine(@linelist[name])
 
-  updateLineChart: (json) =>
+  updateLineChart: (run) =>
     @linelist.previous.valuesY = @linelist.emulated.valuesY
-    @linelist.emulated.valuesY = json.run.emulated_points.points
+    @linelist.emulated.valuesY = run.emulated_points.points
     @linelist.error.calcDifference()
     @linelist.difference.calcDifference()
     @linechart.drawLines()

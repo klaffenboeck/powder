@@ -111,7 +111,6 @@ class @NavChart extends Chart
   mouseover: ->
     _overlay = @display.overlay[0][0]
     return d3.mouse(_overlay)[0]
-    #@current_hover_position()
 
 
 
@@ -124,6 +123,18 @@ class @MiniChart extends Chart
       yAxis: @axisY
       select: @select
 
+
+class @InteractiveMiniChart extends MiniChart
+  constructor: (options={}) ->
+    super(options)
+    @display.overlay.on("mouseover", (d) =>
+      window.m.navigation.show_preview_lines()
+      window.m.navigation.estimate_preview(d.input_params)
+    ).on("mouseout", (d) =>
+      window.m.navigation.hide_preview_lines()
+    ).on("mousedown", (d) =>
+      window.m.updateLineChart(d)
+    )
 
 
 class @Domain
@@ -140,6 +151,7 @@ class @Domain
     scaletyp = @scaletype ? scaledefault
     scale = d3.scale[scaletyp]().clamp(true)
     scale.base(10) if scaletyp == "log"
+    @scale = scale
     @rangeband = scale.range([@height, @width])
     _range = d3.extent(@range)
     _range = [_range[1], _range[0]] if @order == "desc"
