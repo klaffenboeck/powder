@@ -267,3 +267,24 @@ g.peak {
   float: left
 }
 
+#brush {
+  width: 500px;
+  height: 100px;
+  border: 1px solid gray;
+  float: right
+}
+
+.handle:hover {
+  cursor: pointer
+}
+
+.handle:active {
+  cursor: move
+}
+
+.slider .domain {
+  fill: none;
+  stroke: green;
+  stroke-width: 6px
+
+}

@@ -3,6 +3,7 @@
   "dependencies": {
     "d3": "latest",
     "numbers.js": "latest",
-    "knockout": "latest"
+    "knockout": "latest",
+    "spectrum": "latest"
   }
 }
