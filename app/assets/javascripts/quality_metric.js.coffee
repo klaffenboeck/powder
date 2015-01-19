@@ -23,4 +23,11 @@ class @Chi2 extends QualityMetric
     res = v2 / expected
     return res
 
+  normal: (max = 10000) =>
+    bounded_value = @value
+    bounded_value = max if @value > max
+    val = Math.round(bounded_value)
+    res = max - val
+    return res / max
+
 

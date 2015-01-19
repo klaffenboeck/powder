@@ -2,6 +2,7 @@
 #= require ../legend
 #= require ../line_chart
 #= require ../navigation
+#= require ../webgl
 
 class @Manager
   constructor: (options = {}) ->
@@ -36,6 +37,12 @@ class @Manager
     @navigation.estimate_all_lines()
     @navigation.estimate_preview()
 
+    @gl_legend = new WebglLegend2({select: "#webgl"})
+    @gl_legend.addHandle({color: "#0000ff", position: 100})
+    @gl_legend.addHandle({color: "#ff0000", position: 350})
+    @gl_legend.addHandle({color: "#00ff00", position: 200})
+    @gl_legend.addHandle({color: "#ffff00", position: 450})
+
 
   setupLine: (name, domainX, domainY, valuesX, valuesY, color = @black) =>
     @linelist[name] = new Line
@@ -48,7 +55,7 @@ class @Manager
     @linechart.display.addLine(@linelist[name])
 
   setupDiffLine: (name, line1, line2, color = @black) =>
-    console.log(line1)
+    # console.log(line1)
     @linelist[name] = new DiffLine
       name: name
       domainX: line1.domainX
@@ -73,5 +80,13 @@ class @Manager
       arr.push(0)
     return arr
 
+  generateSamples: (options={}) =>
+    amount = options.amount ? 2500
+    computeResults = options.results ? true
+    dims = options.dims ? Object.keys(@parameter_space.content).length
+    @samples = LHS.sample(amount, dims, @parameter_space)
+    if computeResults
+      func = @navigation.estimation_function
+      @samples.computeResults(func)
 
 

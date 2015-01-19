@@ -246,32 +246,40 @@ g.peak {
 
 .overlay {
   //fill: none;
-  opacity: 0.01;
+  opacity: 0.033;
   pointer-events: all;
 }
 
 #navigation, #comparison {
-  width: 20%;
-  height: 600px;
+  height: 400px;
   overflow: scroll;
   float: left;
 }
 
+#navigation {
+    width: 450px;
+}
 
+#comparison {
+  padding-right: 20px;
+  position: relative;
+}
 
 .muted {
   opacity: 0.5
 }
 
-#comparison {
-  float: left
+
+#webgl-legend {
+  width: 520px;
+  float: right;
+  height: 120px;
 }
 
 #brush {
   width: 500px;
-  height: 100px;
-  border: 1px solid gray;
-  float: right
+  height: 20px;
+  // border: 1px solid gray;
 }
 
 .handle:hover {
@@ -284,7 +292,94 @@ g.peak {
 
 .slider .domain {
   fill: none;
-  stroke: green;
-  stroke-width: 6px
+  stroke: gray;
+  stroke-width: 1px
 
+}
+
+#webgl {
+  // background-color: green
+}
+
+#brush {
+  position: relative;
+}
+
+#detailview-1 {
+  .main {
+    position: absolute;
+    right: 100px;
+  }
+  .legend {
+    float: right;
+    padding-top: 20px
+  }
+}
+
+td.chi2 {
+  text-align: right
+}
+
+table.fixedheader {
+  position: fixed;
+  background-color: white;
+  margin-top: -5px;
+}
+
+table.rundisplay {
+  margin-top: 60px
+}
+
+th.id {
+  width: 123px
+}
+
+td.chi2-bar {
+  width: 32px;
+  text-align: left;
+  vertical-align: bottom;
+  div.bar {
+    background-color: green;
+    width: 30px;
+    height: 45px;
+    margin-left: 2px;
+    border: 1px solid gray;
+    margin-bottom: 3px;
+  }
+}
+
+td.chi2-val {
+  width: 53px;
+  vertical-align: bottom;
+  text-align: right;
+  font-size: 12px
+}
+
+#headline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: white;
+  height: 55px;
+  width: 99.75%;
+  // border-bottom: 1px solid black;
+  margin-bottom: 5px;
+  z-index: 10000;
+  // background-color: black;
+  // color: white;
+  // border-bottom-right-radius: 30px;
+  h1 {
+    margin-left: 20px;
+    // color: '#e8e8e8';
+    // font-weight: 200
+  }
+}
+
+#content-wrapper {
+  margin-top: 60px
+}
+
+td.run-id {
+  font-size: 9px;
+  vertical-align: bottom;
 }

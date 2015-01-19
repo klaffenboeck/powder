@@ -23,6 +23,7 @@ class Project::SettingsController < ApplicationController
   # currently the method to get the data into fronted via ajax
   # should be exchanged actually for something more appropriate
   # TODO: change name of call, add new route, delete old one (probably)
+  # TODO: calculation of quality metrics has to be changed (shouldn't happen in controller)
   def remotepost
     parameters = project_setting_params
     inputvals = parameters
@@ -30,6 +31,7 @@ class Project::SettingsController < ApplicationController
     manager = Project::Manager.setup(id)
     run = manager.run(inputvals)
     manager.run_list.add(run)
+    run.calculate_quality_metric
     #render json: run.get_emulated_points.to_json
     render json: run
   end

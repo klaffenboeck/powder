@@ -25,8 +25,8 @@ class @LineChart extends Chart
         right: 10
         bottom: 30
         left: 50
-      total_width: 640
-      total_height: 380
+      total_width: 540
+      total_height: 320
     @stepsX = options.stepsX ? data_angles
     @domainX = new Domain
       range: @stepsX
@@ -54,7 +54,7 @@ class @NavChart extends Chart
     @calc_ticks() if not @ticks
     @axisX = new Axis({domain: @domain, ticks: @ticks})
     @axisY = new KAxis({domain: @quality})
-    @display = new Display
+    @display = new NavDisplay
       select: "#navigation"
       boundaries: @boundaries
       xAxis: @axisX
@@ -67,8 +67,10 @@ class @NavChart extends Chart
     svg = d3.select("#navigation").selectAll("." + @name)
     svg.append("text")
       .data([@name])
-      .attr("y", @boundaries.height + 50)
-      .attr("x", @boundaries.total_width / 2)
+      # .attr("y", @boundaries.height + 50)
+      .attr("y", 25)
+      # .attr("x", @boundaries.total_width / 2)
+      .attr("x", 35)
       .text( (d) ->
         d
       )
@@ -79,38 +81,52 @@ class @NavChart extends Chart
       height: 100
       margin:
         bottom: 10
-        left: 60
-        top: 10
-        right: 20
+        left: 40
+        top: 30
+        right: 10
 
   calc_ticks: =>
-    r = @domain.range
-    t = "a" + r[0] + r[1] # convert to text and get length of text
-    l = t.length - 1
-    lt = 11 - l
+    # r = @domain.range
+    # t = "a" + r[0] + r[1] # convert to text and get length of text
+    # l = t.length - 1
+    # lt = 11 - l
 
-    @ticks = if lt > 2 then lt else 2
-    console.log(t)
+    # @ticks = if lt > 2 then lt else 2
+    @ticks = 2
+
 
   current_position: (position = null) =>
     return @_current_position if position == null
     @_current_position = position
+
+  set_current_position: (position) =>
+    @_current_position = position
+
+  set_position_from_value: (value) =>
+    _pos = @domain.rangeband(value)
+    @set_current_position(_pos)
 
   currX: (pos = null) =>
     position = pos ? @current_position()
     @domain.value_at(position)
 
   get_all_x_values: =>
-    @_x_values ? @domain.width_to_values(10)
+    @_x_values ? @domain.width_to_values(5)
 
   mousedown: (d,i) ->
     _overlay = @display.overlay[0][0]
     @current_position(d3.mouse(_overlay)[0])
-    console.log(@current_position())
+    # console.log(@current_position())
 
   mouseover: ->
     _overlay = @display.overlay[0][0]
     return d3.mouse(_overlay)[0]
+
+  drawNavBar: (barname = "-navbar") =>
+    _bar = @getLines()[@name + barname]
+    _bar.setPosition(@currX())
+    @drawLine(_bar)
+
 
 
 
@@ -130,10 +146,14 @@ class @InteractiveMiniChart extends MiniChart
     @display.overlay.on("mouseover", (d) =>
       window.m.navigation.show_preview_lines()
       window.m.navigation.estimate_preview(d.input_params)
+      # console.log(d)
     ).on("mouseout", (d) =>
       window.m.navigation.hide_preview_lines()
     ).on("mousedown", (d) =>
       window.m.updateLineChart(d)
+      window.m.navigation.set_current_x_values(d.input_params)
+      # console.log(window.m.navigation.current_x_values())
+      window.m.navigation.estimate_all_lines()
     )
 
 
@@ -164,12 +184,22 @@ class @Domain
   value_at: (position) =>
     @rangeband.invert(position)
 
+  position_for: (value) =>
+    @rangeband(value)
+
   width_to_values: (modulo = 1)=>
     _values = []
     for i in [0..@width]
       if i % modulo == 0
         _values.push(@value_at(i))
     return _values
+
+  minVal: =>
+    @range[0]
+
+  maxVal: =>
+    @range[1]
+
 
 
 
@@ -256,12 +286,25 @@ class @BaseDisplay
       )
 
   drawAxis: =>
+    @drawAxisX()
+    @drawAxisY()
+    # @view.append("g")
+    #   .attr("class", "x axis")
+    #   .attr("transform", "translate(0," + @boundaries.height + ")")
+    #   .call(@xAxis.axis);
+
+
+    # @view.append("g")
+    #   .attr("class", "y axis")
+    #   .call(@yAxis.axis);
+
+  drawAxisX: =>
     @view.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + @boundaries.height + ")")
       .call(@xAxis.axis);
 
-
+  drawAxisY: =>
     @view.append("g")
       .attr("class", "y axis")
       .call(@yAxis.axis);
@@ -317,6 +360,11 @@ class @Display extends BaseDisplay
   constructor: (options) ->
     super(options)
     @drawAxis()
+
+class @NavDisplay extends BaseDisplay
+  constructor: (options) ->
+    super(options)
+    @drawAxisX()
 
 
 class @Line
@@ -427,13 +475,34 @@ class @EstLine extends Line
     super(options)
     @key = options.key
 
+class @NavBar extends Line
+  constructor: (options = {}) ->
+    super(options)
+    @key = options.key
+    @valuesY = [@domainY.minVal(), @domainY.maxVal()]
+    @color = new Color("gray")
+    @setPosition(options.position)
+
+  setPosition: (value) =>
+    @valuesX = [value, value]
+
+
+
 class @Color
   constructor: (options={}) ->
     @color = @getColor(options) if typeof options == "string"
     @color = @getColor(options.color) if typeof options == "object"
 
-  getColor: (string) ->
-    d3.rgb(string)
+  getColor: (string = null) ->
+    return d3.rgb(string) unless string == null
+    @color
+
+  setColor: (color) =>
+    @color = @getColor(color)
+
+
+
+
 
 
 

@@ -49,7 +49,7 @@ class Project::Manager
   
   def run(input_params, position = nil)
     input_params = correct_params(input_params)
-    executable.run(input_params, setting, position)
+    run = executable.run(input_params, setting, position)
   end
   
   def estimation_function

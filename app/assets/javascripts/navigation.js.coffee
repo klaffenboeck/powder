@@ -6,6 +6,7 @@ class @Navigation
     {@estimation_function, @boundaries} = options
     @set_default_boundaries() if not @boundaries
     @parameter_space = @estimation_function.parameter_space
+    @busy = true    
     @quality = new Domain
       name: "quality"
       range: [1,10000]
@@ -19,13 +20,16 @@ class @Navigation
     for key, range of @parameter_space
       _domain = new Domain({name: key, range: range, width: @boundaries.width })
       _chart = new NavChart({boundaries: @boundaries, quality: @quality, domain: _domain, name: key })
-      @value_arrays[key] = _domain.width_to_values(10)
+      @value_arrays[key] = _domain.width_to_values(5)
       @setup_mousedown(_chart)
       _line = new EstLine({name: key, key: key, domainY: @quality, domainX: _domain, valuesX: @value_arrays[key]})
       _preview_line = new EstLine({name: key + "-preview", key: key, domainY: @quality, domainX: _domain, valuesX: @value_arrays[key], color: @preview_color})
+      _navbar = new NavBar({name: key + "-navbar", key: key, domainY: @quality, domainX: _domain, position: _chart.currX()})
       _preview_line.hide()
       _chart.addLine(_line)
       _chart.addLine(_preview_line)
+      _chart.addLine(_navbar)
+      _chart.drawNavBar()
       _curr = @current_position
       @charts[key] = _chart
 
@@ -38,6 +42,7 @@ class @Navigation
     chart.display.overlay.on("mousedown", =>
       _chart.mousedown()
       @estimate_all_lines()
+      chart.drawNavBar()
       $.ajax(
         url: document.URL + "/remotepost"
         cache: false
@@ -56,7 +61,9 @@ class @Navigation
     _overlay.on("mousemove", =>
       _value = _chart.mouseover()
       # console.log(_chart.currX(_value))
-      @estimate_preview(_chart.name, _chart.currX(_value))
+      if !@busy
+        @busy = true
+        @estimate_preview(_chart.name, _chart.currX(_value))
     )
     _overlay.on("mouseout", =>
       @hide_preview_lines()
@@ -68,10 +75,10 @@ class @Navigation
       width: 100
       height: 100
       margin:
-        bottom: 60
-        left: 60
-        top: 10
-        right: 20
+        bottom: 35
+        left: 20
+        top: 30
+        right: 10
 
   current_positions: =>
     _positions = []
@@ -91,6 +98,12 @@ class @Navigation
         _hash[key] = chart.currX()
       return _hash
 
+  set_current_x_values: (values) =>
+    _count = 0
+    for key, chart of @charts
+      chart.set_position_from_value(values[_count])
+      _count += 1
+
   estimate_line: (line, fixed) =>
     _params = {}
     _keys = Object.keys(fixed)
@@ -107,14 +120,13 @@ class @Navigation
     _retval
 
   estimate_all_lines: =>
-    # _start = Date.now()
     _fixed = @current_x_values()
     for key, chart of @charts
       _line = chart.getLines()[key]
       _line.valuesY = @estimate_line(_line, _fixed)
       chart.drawLine(_line)
-    # _end = Date.now()
-    # console.log("TIME: " + (_end - _start))
+      chart.drawNavBar()
+
 
   estimate_preview: (key = null, value = null) =>
     _fixed = @current_x_values()
@@ -126,7 +138,8 @@ class @Navigation
     for key, chart of @charts
       _line = chart.getLines()[key + "-preview"]
       _line.valuesY = @estimate_line(_line, _fixed)
-      chart.drawLine(_line, 50)
+      chart.drawLine(_line, 5)
+    @busy = false
 
 
   show_preview_lines: =>

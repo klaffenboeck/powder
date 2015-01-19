@@ -30,9 +30,12 @@ class @SmallMultiples
 
   setup: =>
     @base = d3.select(@select)
+    @tabletop = @base.append("table")
     @table = @base.append("table")
-    @header = @table.append("thead").append("tr").attr("class", "header")
-    @header.append("th").text("ID")
+    @tabletop.attr("class","fixedheader")
+    @table.attr("class","rundisplay")
+    @header = @tabletop.append("thead").append("tr").attr("class", "header")
+    @header.append("th").attr("class","id").text("ID")
     @th_expected = @header.append("th")
     @th_expected.attr("class", "expected")
     @thumb_expected = @createThumbnail("expected_line", "th.expected", false)
@@ -87,15 +90,36 @@ class @SmallMultiples
     _tr_run = @enter.insert("tr",".run").attr("class", (d) ->
       "run id" + d.id
     )
+    _tr_run.append("td").attr("class", "run-id").text( (d) ->
+      "(" + d.id + ")"
+    )
     _tr_run.append("td").attr("class", (d)-> 
       "thumbnail id" + d.id
-    ).text( (d) ->
-      # @createThumbnail("observed",)
-      d.id
     )
-    _tr_run.append("td").attr("class", "chi2").text( (d) ->
-      d.chi2.value 
-    )
+    # ).text( (d) ->
+    #   # @createThumbnail("observed",)
+    #   d.id
+    # )
+
+    _td_chi2_val = _tr_run.append("td")
+      .attr("class", "chi2-val")
+      .text( (d) ->
+        d.chi2.normal()
+      )
+    _td_chi2_bar = _tr_run.append("td")
+      .attr("class", "chi2-bar")
+
+    # _td_chi2.text( (d) ->
+
+    #   d.chi2.normal()
+    # )
+
+    # _td_chi2.append("svg")
+    #   .attr("class","bar")
+    #   .attr("width", 30)
+    #   .attr("height", 45)
+
+    _td_chi2_bar.append("div").attr("class","bar")
 
     _tr_run.each( (d) =>
       classId = ".thumbnail.id" + d.id
@@ -104,6 +128,17 @@ class @SmallMultiples
       _thumb.drawLines()
     )
 
+    @update = d3.selectAll(".chi2-bar div.bar").data(@runs)
+    y = d3.scale.linear()
+      .domain([0,1])
+      .range([0,45])
+    @update.style("height", (d) =>
+      return y(d.chi2.normal()) + "px"
+    )
+    @update.style("background-color", (d) =>
+      return window.m.gl_legend.slider.getColorAt(d.chi2.normal()).toString()
+    )
+    # @update.style("height", "20px")
 
 class @History extends SmallMultiples
   constructor: (options={}) ->

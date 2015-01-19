@@ -1,11 +1,83 @@
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+attribute vec2 a_position;
+attribute float a_color;
+
+uniform float u_size;
+
+varying lowp float v_color;
+
+
+void main(void) {
+  gl_Position = vec4(a_position, 0.0, u_size);
+  v_color = a_color;
+}
+
+</script>
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+varying lowp float v_color;
+
+const int size = 101; 
+uniform lowp float u_step[size];
+uniform lowp vec4 u_colorValues[size];
+uniform int u_length;
+
+void main(void) {
+  lowp float col = v_color;
+  mediump vec4 colors1, colors2, colordiff, newcol;
+  mediump float stepwidth, currentStep;
+
+  mediump float r = 0.0, g = 0.0, b = 0.0, rWidth, gWidth, bWidth;
+  for(int i = 1; i < size; i++) {
+    if(u_step[i] >= col) {
+      stepwidth = u_step[i] - u_step[i-1];
+      if(stepwidth == 0.0) {
+        stepwidth == 0.000000000001;
+      }
+      currentStep = (v_color - u_step[i-1]) / stepwidth;
+      colors1 = u_colorValues[i-1];
+      colors2 = u_colorValues[i];
+      rWidth = colors2.r - colors1.r;
+      gWidth = colors2.g - colors1.g;
+      bWidth = colors2.b - colors1.b;
+      r = colors1.r + currentStep * rWidth;
+      g = colors1.g + currentStep * gWidth;
+      b = colors1.b + currentStep * bWidth;
+      newcol = vec4(r,g,b,1.0);
+      break;
+    }
+  }
+  gl_FragColor = newcol;
+}
+
+// precision mediump float;
+
+// uniform vec2 u_size;
+
+// void main(void) {
+//   gl_FragColor = vec4(gl_FragCoord.x / u_size.x, gl_FragCoord.y / u_size.y, 0.0, 1.0);
+// }
+
+</script>
+
+<div id="headline">
 <h1>Powder workspace</h1>
+</div>
 
 <% @project_setting.name %>
 
 <!-- div id="button">ajax</div>
 <div id="post">post</div>m-->
-<div id="navigation"></div>
-<div id="comparison"></div>
-<div id="brush"></div>
+<div id="content-wrapper">
+  <div id="navigation"></div>
+  <div id="comparison"></div>
+  <div id="webgl-legend" style="position: absolute; top: 500px; left: 20px">
+    <canvas id="webgl" width="500" height="50"></canvas>
+    <div id="brush"></div>
+  </div>
+</div>
 <%= render "inline_js" %>
 <%= render "detail_view" %>
+
+
