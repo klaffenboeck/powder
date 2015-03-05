@@ -109,15 +109,6 @@ class @SmallMultiples
     _td_chi2_bar = _tr_run.append("td")
       .attr("class", "chi2-bar")
 
-    # _td_chi2.text( (d) ->
-
-    #   d.chi2.normal()
-    # )
-
-    # _td_chi2.append("svg")
-    #   .attr("class","bar")
-    #   .attr("width", 30)
-    #   .attr("height", 45)
 
     _td_chi2_bar.append("div").attr("class","bar")
 
@@ -143,7 +134,6 @@ class @SmallMultiples
 class @History extends SmallMultiples
   constructor: (options={}) ->
     super(options)
-
 
 
 class @Run

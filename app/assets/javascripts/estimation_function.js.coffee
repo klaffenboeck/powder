@@ -29,7 +29,10 @@ class @GaussianProcessModel extends EstimationFunction
 
   estimate_normal: (current_vector) =>
     value = @est(current_vector)
-    return (10000 - value) / 10000
+    normal = (10000 - value) / 10000
+    normal = 0 if normal < 0
+    normal = 1 if normal > 1
+    return normal
 
   corr_theta: (vector1, vector2, t = @theta) =>
     sum = 0

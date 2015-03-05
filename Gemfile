@@ -32,6 +32,7 @@ gem 'compass-rails' # you need this or you get an err
 gem 'zurb-foundation', '~> 4.0.0'
 
 gem 'rinruby'
+gem 'rserve-client'
 
 gem 'bower-rails', "~> 0.9.1"
 

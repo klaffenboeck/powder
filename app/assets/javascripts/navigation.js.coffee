@@ -20,18 +20,21 @@ class @Navigation
     for key, range of @parameter_space
       _domain = new Domain({name: key, range: range, width: @boundaries.width })
       _chart = new NavChart({boundaries: @boundaries, quality: @quality, domain: _domain, name: key })
-      @value_arrays[key] = _domain.width_to_values(5)
+      @value_arrays[key] = _domain.width_to_values(2)
       @setup_mousedown(_chart)
       _line = new EstLine({name: key, key: key, domainY: @quality, domainX: _domain, valuesX: @value_arrays[key]})
       _preview_line = new EstLine({name: key + "-preview", key: key, domainY: @quality, domainX: _domain, valuesX: @value_arrays[key], color: @preview_color})
       _navbar = new NavBar({name: key + "-navbar", key: key, domainY: @quality, domainX: _domain, position: _chart.currX()})
+      _estnavbar = new EstNavBar({name: key + "-navbar-preview", key: key, domainY: @quality, domainX: _domain, position: _chart.currX()})
       _preview_line.hide()
       _chart.addLine(_line)
       _chart.addLine(_preview_line)
       _chart.addLine(_navbar)
+      _chart.addLine(_estnavbar)
       _chart.drawNavBar()
       _curr = @current_position
       @charts[key] = _chart
+    # cvh = new ComplexViewHolder({domains: @getAllDomains(), slider: @slider})
 
   mousedown: (options) ->
     console.log(this)
@@ -84,7 +87,17 @@ class @Navigation
     _positions = []
     for key, chart of @charts 
       _positions.push(chart.current_position())
-    return _positions
+    return 
+
+  getAllDomains: =>
+    domains = []
+    for name, chart of @charts
+      domains.push(chart.domain)
+    return domains
+
+  getDomain: (index) =>
+    @getAllDomains()[index]
+
 
   current_x_values: (returntype = "hash")=>
     if returntype == "array"
@@ -103,6 +116,12 @@ class @Navigation
     for key, chart of @charts
       chart.set_position_from_value(values[_count])
       _count += 1
+
+  current_hover_positions: =>
+    return @_current_hover_positions
+
+  set_current_hover_positions: (array) =>
+    @_current_hover_positions = array
 
   estimate_line: (line, fixed) =>
     _params = {}
@@ -139,25 +158,100 @@ class @Navigation
       _line = chart.getLines()[key + "-preview"]
       _line.valuesY = @estimate_line(_line, _fixed)
       chart.drawLine(_line, 5)
+      chart.drawEstNavBar(_fixed[key])
     @busy = false
 
 
   show_preview_lines: =>
-    # _start = Date.now()
     for key, chart of @charts
       _line = chart.getLines()[key + "-preview"]
       _line.show()
+      _bar = chart.getLines()[key + "-navbar-preview"]
+      _bar.show()
       chart.drawLine(_line, 0)
-    # _end = Date.now()
-    # console.log("TIME: " + (_end - _start))
+      chart.drawLine(_bar, 0)
+
 
   hide_preview_lines: =>
     for key, chart of @charts
       _line = chart.getLines()[key + "-preview"]
       _line.hide()
+      _bar = chart.getLines()[key + "-navbar-preview"]
+      _bar.hide()
       chart.drawLine(_line, 0)
+      chart.drawLine(_bar, 0)
 
 
+class @ComplexViewHolder
+  _slide_counter = 0
+  _nav_domains = undefined
+  slides = []
+  constructor: (options = {}) ->
+    {@slider, @sampling} = options
+    _nav_domains = options.domains
+    slides = []
+    @width = options.width ? 200
+
+  newProjectionView: (x = 0, y = 2) =>
+    # $("#webgl-area").prepend(@getTemplate())
+    view = d3.select("#webgl-area")
+    id = "complex-view-" + @getSlideCount()
+    id2 = "complex-side-" + @getSlideCount()
+    wplus = @width + 50
+    div = view.insert("div",":first-child")
+      .attr("class", "complex-view")
+      .attr("id", id)
+      .attr("style", "width:" + wplus + "px; height: " + wplus + "px;")
+    axisY = div.append("svg").attr("class", "axis y")
+      .attr("width", 30)
+      .attr("height", @width)
+      .attr("transform", "translate(30,0)")
+    slide = div.append("canvas").attr("class", "complex-slide")
+      .attr("id", id2)
+      .attr("width", @width)
+      .attr("height", @width)
+      .attr("transform", "translate(30, 0)")
+    axisX = div.append("svg").attr("class", "axis x")
+      .attr("width", @width + 50)
+      .attr("height", 30)
+      .attr("transform", "translate(32,0)")
+    @increaseSlideCounter()
+    slide = new ProjectionView({slider: @slider, sampling: @sampling, select: "#" + id, holder: @, width: @width })
+    @addSlide(slide)
+    slide.getMaxima(x, y)
+    return slide
+
+  getDomain: (number) =>
+    return _nav_domains[number]
+
+  increaseSlideCounter: =>
+    _slide_counter += 1
+
+  getSlideCount: =>
+    return _slide_counter
+
+  addSlide: (slide) =>
+    slides.push(slide)
+
+  getSlides: (num = null) =>
+    return slides if num == null
+    @getSlide(num)
+
+  getSlide: (num) =>
+    return slides[num]
+
+  getAxis: (num, orient) =>
+    _domain = @getDomain(num)
+    type = _domain.getScaleType()
+    domain = _domain.domain.domain()
+    range = if orient == "bottom" then [0,200] else [200,0]
+    scale = d3.scale.linear()
+      .domain(domain)
+      .range(range)
+    axis = d3.svg.axis()
+      .scale(scale)
+      .orient(orient)
+    return axis
 
 
 

@@ -22,6 +22,7 @@ class Estimation::Function < ActiveRecord::Base
         func.generate_run_list
         func.save
         func.run_list.calculate_quality_metrics
+        p "starting with R"
         R.matrix = func.run_list.input_matrix
         R.result = func.run_list.result_vector
         R.eval "output <- mlegp(matrix, result)"
@@ -54,8 +55,8 @@ class Estimation::Function < ActiveRecord::Base
 
   def further_setup
     #self.input_matrix = Matrix.rows(run_list.input_matrix)
-    self.inv_var_matrix = Matrix.rows(raw_data.inv_var_matrix) if !!raw_data.inv_var_matrix
-    self.result_vector = Vector.elements(run_list.result_vector) if !!run_list.result_vector
+    self.inv_var_matrix = Matrix.rows(raw_data.inv_var_matrix) if !!raw_data && !!raw_data.inv_var_matrix
+    self.result_vector = Vector.elements(run_list.result_vector) if !!run_list && !!run_list.result_vector
   end
 
   # def serialize

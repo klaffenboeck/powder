@@ -9,10 +9,13 @@ class @Slider
   constructor: (options={}) ->
     {@select, @legend} = options
     @boundaries = new Boundaries
-      width: 500
+      width: @legend.slider_value
       height: 100
 
     _new_handle = false
+
+    @subscribers = []
+    @subscribe(@legend)
 
     @domain = options.domain ? @defaultDomain()
 
@@ -53,20 +56,32 @@ class @Slider
       min: 0
       max: 1
       scaletype: "linear"
-      width: 500
+      width: @legend.slider_value
       # height: 20
 
+  redrawSubscribers: =>
+    for subscriber in @subscribers
+      subscriber.redraw()
+
+
+  subscribe: (subscriber) =>
+    @subscribers.push(subscriber)
+
   addHandle: (options={}) =>
-    _color = options.color ? new Color("black")
+    _color = undefined # options.color ? new Color("black")
     _autocolor = options.autocolor ? false
+    if _autocolor
+      _color = @getColorAt(options.position / @legend.slider_value).toString()
+    else 
+      _color = options.color ? new Color("black")
     _handle = new Handle
       slider: @
       color: _color
     _handle.reposition(options.position) if options.position
-    _handle.changeColor(@getColorAt(_handle.value())) if _autocolor
+    # _handle.changeColor(@getColorAt(_handle.value())) if _autocolor
     @handles.push(_handle)
     @resort()
-    @legend.redraw()
+    @redrawSubscribers()
 
 
   removeHandle: (handle) =>
@@ -77,7 +92,7 @@ class @Slider
     $(handle.handle[0][0]).remove()
     @handles = array
     @resort()
-    @legend.redraw()
+    @redrawSubscribers()
     window.m.hist.render()
 
   resort: =>
@@ -154,6 +169,8 @@ class @Slider
     _new_handle = false
 
 
+
+
 class @Handle
   _last_click = 0
   constructor: (options={}) ->
@@ -176,25 +193,25 @@ class @Handle
       .on("brushstart", =>
         _offset = @getPosition() - d3.mouse(@overlay)[0]
         _start = @getPosition()
-        @slider.noNewHandle()
+        # @slider.noNewHandle()
         $(".picker").spectrum("hide")
       )
       .on("brush", =>
         @reposition(d3.mouse(@overlay)[0] + _offset) 
-        @slider.noNewHandle()
+        # @slider.noNewHandle()
         @slider.resort()
-        @slider.legend.redraw()
+        @slider.redrawSubscribers()
       )
       .on("brushend", =>
         # marker didn't get moved, only clicked
-        if @doubleClick(Date.now())
+        if @doubleClick(Date.now()) or @outOfRange()
           @slider.removeHandle(@)
           return
         d3.event.sourceEvent.preventDefault()
         if _start == @getPosition() 
           $(@picker).spectrum("show")
         @slider.resort()
-        @slider.legend.redraw()
+        @slider.redrawSubscribers()
         window.m.hist.render()
       )
 
@@ -242,10 +259,16 @@ class @Handle
   getPosition: =>
     @brush.extent()[0]
 
+  outOfRange: =>
+    if @getPosition() < -1 or @getPosition() > @slider.domain.width + 1
+      return true
+    else 
+      return false
+
   changeColor: (color) =>
     @handle.attr("fill", color)
     @color.setColor(color)
-    @slider.legend.redraw()
+    @slider.redrawSubscribers()
     window.m.hist.render()
 
   setDirection: (direction) =>

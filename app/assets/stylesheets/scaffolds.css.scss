@@ -252,7 +252,7 @@ g.peak {
 
 #navigation, #comparison {
   height: 400px;
-  overflow: scroll;
+  overflow-y: scroll;
   float: left;
 }
 
@@ -382,4 +382,21 @@ td.chi2-val {
 td.run-id {
   font-size: 9px;
   vertical-align: bottom;
+}
+
+
+#webgl-area {
+  .complex-view{
+    float: left;
+    position: relative;
+  }
+  // .complex-slide{
+  //   position: absolute;
+  //   top: 0;
+  //   right: 0;
+  // }
+}
+
+.axis{
+  font-size: 8px;
 }

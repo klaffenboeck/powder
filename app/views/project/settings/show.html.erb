@@ -5,7 +5,7 @@ attribute float a_color;
 
 uniform float u_size;
 
-varying lowp float v_color;
+invariant varying lowp float v_color;
 
 
 void main(void) {
@@ -16,7 +16,7 @@ void main(void) {
 </script>
 <script id="fragment-shader" type="x-shader/x-fragment">
 
-varying lowp float v_color;
+invariant varying lowp float v_color;
 
 const int size = 101; 
 uniform lowp float u_step[size];
@@ -35,29 +35,27 @@ void main(void) {
       if(stepwidth == 0.0) {
         stepwidth == 0.000000000001;
       }
-      currentStep = (v_color - u_step[i-1]) / stepwidth;
-      colors1 = u_colorValues[i-1];
-      colors2 = u_colorValues[i];
-      rWidth = colors2.r - colors1.r;
-      gWidth = colors2.g - colors1.g;
-      bWidth = colors2.b - colors1.b;
-      r = colors1.r + currentStep * rWidth;
-      g = colors1.g + currentStep * gWidth;
-      b = colors1.b + currentStep * bWidth;
+      // currentStep = (v_color - u_step[i-1]) / stepwidth;
+      // colors1 = u_colorValues[i-1];
+      // colors2 = u_colorValues[i];
+      // rWidth = colors2.r - colors1.r;
+      // gWidth = colors2.g - colors1.g;
+      // bWidth = colors2.b - colors1.b;
+      // r = colors1.r + currentStep * rWidth;
+      // g = colors1.g + currentStep * gWidth;
+      // b = colors1.b + currentStep * bWidth;
+      // newcol = vec4(r,g,b,1.0);
+      // break;
+      colors1 = u_colorValues[i];
+      r = colors1.r;
+      g = colors1.g;
+      b = colors1.b;
       newcol = vec4(r,g,b,1.0);
       break;
     }
   }
   gl_FragColor = newcol;
 }
-
-// precision mediump float;
-
-// uniform vec2 u_size;
-
-// void main(void) {
-//   gl_FragColor = vec4(gl_FragCoord.x / u_size.x, gl_FragCoord.y / u_size.y, 0.0, 1.0);
-// }
 
 </script>
 
@@ -72,8 +70,11 @@ void main(void) {
 <div id="content-wrapper">
   <div id="navigation"></div>
   <div id="comparison"></div>
-  <div id="webgl-legend" style="position: absolute; top: 500px; left: 20px">
-    <canvas id="webgl" width="500" height="50"></canvas>
+
+  <div id="webgl-area" style="position: absolute; top: 500px; left: 20px">
+    <!--<canvas id="projection-view" width="200" height="200"></canvas>-->
+    <div style="clear: both"></div>
+    <canvas id="gl_legend" width="500" height="50" data-slider-max="500"></canvas>
     <div id="brush"></div>
   </div>
 </div>

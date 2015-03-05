@@ -37,11 +37,17 @@ class @Manager
     @navigation.estimate_all_lines()
     @navigation.estimate_preview()
 
-    @gl_legend = new WebglLegend2({select: "#webgl"})
+    @gl_legend = new WebglLegend2({select: "#gl_legend"})
     @gl_legend.addHandle({color: "#0000ff", position: 100})
     @gl_legend.addHandle({color: "#ff0000", position: 350})
     @gl_legend.addHandle({color: "#00ff00", position: 200})
     @gl_legend.addHandle({color: "#ffff00", position: 450})
+    @sampling = @generateSamples()
+    @complex_view_holder = new ComplexViewHolder
+      domains: @navigation.getAllDomains()
+      slider: @gl_legend.slider
+      sampling: @sampling
+    @complex_view_holder.newProjectionView()
 
 
   setupLine: (name, domainX, domainY, valuesX, valuesY, color = @black) =>
@@ -81,12 +87,15 @@ class @Manager
     return arr
 
   generateSamples: (options={}) =>
-    amount = options.amount ? 2500
+    amount = options.amount ? 25000
     computeResults = options.results ? true
     dims = options.dims ? Object.keys(@parameter_space.content).length
-    @samples = LHS.sample(amount, dims, @parameter_space)
+    sample_type = options.sample_type ? Ortho
+
+    @samples = sample_type.sample(amount, dims, @parameter_space)
     if computeResults
       func = @navigation.estimation_function
-      @samples.computeResults(func)
+      @samples.computeResults({estfunc: func})
+    @samples
 
 

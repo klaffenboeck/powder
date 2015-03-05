@@ -16,7 +16,6 @@ class @Chart
     @display.lines
 
 
-
 class @LineChart extends Chart
   constructor: (options={}) ->
     boundaries = new Boundaries
@@ -44,7 +43,6 @@ class @LineChart extends Chart
       yAxis: axisY
       name: "mainview"
     @lines = []
-
 
 
 class @NavChart extends Chart
@@ -127,7 +125,10 @@ class @NavChart extends Chart
     _bar.setPosition(@currX())
     @drawLine(_bar)
 
-
+  drawEstNavBar: (position, barname = "-navbar-preview") =>
+    _bar = @getLines()[@name + barname]
+    _bar.setPosition(position)
+    @drawLine(_bar, 0)
 
 
 class @MiniChart extends Chart
@@ -158,6 +159,7 @@ class @InteractiveMiniChart extends MiniChart
 
 
 class @Domain
+  scaletyp = undefined
   constructor: (options={}) ->
     {@min, @max, @scaletype, @order} = options
     @name = options.name ? ""
@@ -200,8 +202,11 @@ class @Domain
   maxVal: =>
     @range[1]
 
+  getScaleType: =>
+    return scaletyp
 
-
+  getScale: =>
+    return @scale
 
 class @Boundaries
   constructor: (options={}) ->
@@ -215,7 +220,6 @@ class @Boundaries
     @height ?= @total_height - @margin.bottom - @margin.top
     @total_width ?= @width + @margin.left + @margin.right
     @total_height ?= @height + @margin.bottom + @margin.top
-
 
 
 class @Axis
@@ -243,6 +247,7 @@ class @KAxis extends Axis
     @k_format = d3.format("s")
     @axis.tickFormat(@k_format)
 
+class @DisplayAxis
 
 
 class @BaseDisplay
@@ -251,7 +256,7 @@ class @BaseDisplay
     @name = options.name ? "undeclared"
     @lines = {}
     @setup()
-    # @create() 
+
     
   setup: ->
     b = @boundaries
@@ -288,15 +293,6 @@ class @BaseDisplay
   drawAxis: =>
     @drawAxisX()
     @drawAxisY()
-    # @view.append("g")
-    #   .attr("class", "x axis")
-    #   .attr("transform", "translate(0," + @boundaries.height + ")")
-    #   .call(@xAxis.axis);
-
-
-    # @view.append("g")
-    #   .attr("class", "y axis")
-    #   .call(@yAxis.axis);
 
   drawAxisX: =>
     @view.append("g")
@@ -311,8 +307,6 @@ class @BaseDisplay
 
   track_mouse: (value) =>
     _axis = @xAxis
-
-
 
   stop_tracking: =>
     @overlay.on("mousemove", null)
@@ -486,6 +480,17 @@ class @NavBar extends Line
   setPosition: (value) =>
     @valuesX = [value, value]
 
+
+class @EstNavBar extends Line
+  constructor: (options = {}) ->
+    super(options)
+    @key = options.key
+    @valuesY = [@domainY.minVal(), @domainY.maxVal()]
+    @color = new Color("#ee0000")
+    @setPosition(options.position)
+
+  setPosition: (value) =>
+    @valuesX = [value, value]
 
 
 class @Color
