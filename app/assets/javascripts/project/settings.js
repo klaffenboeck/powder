@@ -11,17 +11,9 @@ ready = function() {
     console.log("MANAGER");
     console.log(window.manager);
     window.m = window.manager;
+    get_runs();
   });
-  $.ajax({
-    url: document.URL + "/get_runs",
-    cache: false
-  })
-  .done(function( json ) {
-    console.log("remote done, start setup")
-    window.m.runs = json
-    window.m.hist = new History({runs: m.runs.runs})
-    window.m.hist.render()
-  });
+
   // $("#post").click(function() {
   //   $.ajax({
   //     url: document.URL + "/remotepost",
@@ -38,3 +30,17 @@ ready = function() {
 
 $(document).ready(ready);
 $(document).on('page:load', ready);
+
+var get_runs;
+get_runs = function() {
+  $.ajax({
+    url: document.URL + "/get_runs",
+    cache: false
+  })
+  .done(function( json ) {
+    console.log("remote done, start setup")
+    window.m.runs = json
+    window.m.hist = new History({runs: m.runs.runs})
+    window.m.hist.render()
+  });
+};

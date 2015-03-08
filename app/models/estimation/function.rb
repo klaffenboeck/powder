@@ -22,14 +22,29 @@ class Estimation::Function < ActiveRecord::Base
         func.generate_run_list
         func.save
         func.run_list.calculate_quality_metrics
-        p "starting with R"
-        R.matrix = func.run_list.input_matrix
-        R.result = func.run_list.result_vector
-        R.eval "output <- mlegp(matrix, result)"
-        func.raw_data.mu = R.pull("output$mu")[0,0]
-        func.raw_data.sig2 = R.pull("output$sig2")
-        func.raw_data.inv_var_matrix = R.pull("output$invVarMatrix")
-        func.raw_data.theta = R.pull("output$beta")
+
+        # R.matrix = func.run_list.input_matrix
+        # R.result = func.run_list.result_vector
+        # R.eval "output <- mlegp(matrix, result)"
+        # func.raw_data.mu = R.pull("output$mu")[0,0]
+        # func.raw_data.sig2 = R.pull("output$sig2")
+        # func.raw_data.inv_var_matrix = R.pull("output$invVarMatrix")
+        # func.raw_data.theta = R.pull("output$beta")
+
+        conn = Rserve::Connection.new
+        conn.eval("library(mlegp);")
+        r_matrix = Rserve::REXP::Wrapper.wrap(func.run_list.input_matrix)
+        r_vector = Rserve::REXP::Wrapper.wrap(func.run_list.result_vector)
+        conn.assign("matrix", r_matrix)
+        conn.assign("vector", r_vector)
+        output = conn.eval("output <- mlegp(matrix, vector)")
+        r_output = output.to_ruby
+        func.raw_data.mu = r_output["mu"][0,0]
+        func.raw_data.sig2 = r_output["sig2"]
+        func.raw_data.inv_var_matrix = r_output["invVarMatrix"]
+        func.raw_data.theta = r_output["beta"]
+
+
         func.save
         func.raw_data.save
       end

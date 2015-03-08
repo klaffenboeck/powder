@@ -90,7 +90,7 @@ class @Manager
     amount = options.amount ? 25000
     computeResults = options.results ? true
     dims = options.dims ? Object.keys(@parameter_space.content).length
-    sample_type = options.sample_type ? Ortho
+    sample_type = options.sample_type ? Hybrid
 
     @samples = sample_type.sample(amount, dims, @parameter_space)
     if computeResults
