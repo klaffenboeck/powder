@@ -222,9 +222,19 @@ g.peak {
 }
 
 #detailview-1 {
-    float: right;
+  float: right;
   position: relative;
+  .main, .error {
+    position: relative;
+    .brush {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
 }
+
+
 
 .line[data-active="true"], .line[data-hover="true"][data-active="true"]{
     stroke: red;
@@ -314,6 +324,11 @@ g.peak {
     float: right;
     padding-top: 20px
   }
+  .error {
+    position: absolute;
+    right: 100px;
+    top: 360px;
+  }
 }
 
 td.chi2 {
@@ -400,3 +415,28 @@ td.run-id {
 .axis{
   font-size: 8px;
 }
+
+.main .extent {
+  stroke: red;
+  fill: red;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
+.error .extent {
+  stroke: green;
+  fill: green;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
+.error .brush {
+  .resize {
+    &.n, &.s {
+      cursor: move !important;
+    }
+  }
+  .background {
+    cursor: ew-resize !important;
+  }
+}   

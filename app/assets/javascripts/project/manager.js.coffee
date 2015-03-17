@@ -37,6 +37,8 @@ class @Manager
     @navigation.estimate_all_lines()
     @navigation.estimate_preview()
 
+    @errorchart = new ErrorChart()
+
     @gl_legend = new WebglLegend2({select: "#gl_legend"})
     @gl_legend.addHandle({color: "#0000ff", position: 100})
     @gl_legend.addHandle({color: "#ff0000", position: 350})

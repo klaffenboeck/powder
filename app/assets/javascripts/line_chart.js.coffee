@@ -15,6 +15,18 @@ class @Chart
   getLines: =>
     @display.lines
 
+  checkBrush: =>
+    extent = @brush.extent()
+    return false if extent[0][0] == extent[1][0] or extent[0][1] == extent[1][1] 
+    return true
+
+  createBlock: (params) =>
+    valuesX = [params[0][0], params[1][0]]
+    valuesY = [params[0][1], params[1][1]]
+    block = new Block({domainX: @domainX, domainY: @domainY, valuesX: valuesX, valuesY: valuesY, name: "block1"})
+    return block
+
+
 
 class @LineChart extends Chart
   constructor: (options={}) ->
@@ -35,14 +47,92 @@ class @LineChart extends Chart
       height: boundaries.height
     axisX = new Axis(
       domain: @domainX)
-    axisY = new Axis({domain: @domainY})
-    @display = new Display
+    axisY = new KAxis({domain: @domainY})
+    @display = new BrushDisplay
       select: "#detailview-1 .main"
       boundaries: boundaries
       xAxis: axisX
       yAxis: axisY
       name: "mainview"
     @lines = []
+
+    @brush = d3.svg.brush()
+      .x(@domainX.domain)
+      .y(@domainY.domain)
+      .extent([[0,0],[0,0]])
+      .on("brush", =>
+        @brush.extent()
+        console.log(@brush.event)
+      )
+      .on("brushend", =>
+        console.log(@brush.extent())
+        console.log(@checkBrush())
+      )
+
+    #@display.view.call(@brush)
+    @display.svg_brush
+      .call(@brush)
+
+class @ErrorChart extends Chart
+  _bottom = null
+  _top = null
+  constructor: (options={}) ->
+    boundaries = new Boundaries
+      margin:
+        top: 10
+        right: 10
+        bottom: 30
+        left: 50
+      total_width: 540
+      total_height: 160
+    @stepsX = options.stepsX ? data_angles
+    @domainX = new Domain
+      range: @stepsX
+      width: boundaries.width
+    @domainY = new Domain
+      range: measured_points
+      height: boundaries.height
+    axisX = new Axis(
+      domain: @domainX)
+    axisY = new KAxis({domain: @domainY, ticks: 3})
+    @display = new BrushDisplay
+      select: "#detailview-1 .error"
+      boundaries: boundaries
+      xAxis: axisX
+      yAxis: axisY
+      name: "errorview"
+    @lines = []
+
+    _bottom = @domainY.getMin()
+    _top = @domainY.getMax()
+
+    @brush = d3.svg.brush()
+      .x(@domainX.domain)
+      .y(@domainY.domain)
+      .extent([[0,_bottom],[0,_top]])
+      .on("brushstart", =>
+        brush = @brush.extent()
+        _bottom = @domainY.getMin()
+        _top = @domainY.getMax()
+        @brush.extent([[brush[0][0], _bottom], [brush[1][0], _top] ])
+        @display.svg_brush
+          .call(@brush)
+      )
+      .on("brush", =>
+        brush = @brush.extent()
+        @brush.extent([[brush[0][0], _bottom], [brush[1][0], _top] ])
+        @display.svg_brush
+          .call(@brush)
+
+      )
+      .on("brushend", =>
+        console.log(@brush.extent())
+        @display.svg_brush
+          .call(@brush)
+      )
+
+    @display.svg_brush
+      .call(@brush)
 
 
 class @NavChart extends Chart
@@ -208,6 +298,12 @@ class @Domain
   getScale: =>
     return @scale
 
+  getMin: =>
+    @domain.domain()[0]
+
+  getMax: =>
+    @domain.domain()[1]
+
 class @Boundaries
   constructor: (options={}) ->
     {@total_width, @total_height, @width, @height} = options
@@ -283,27 +379,28 @@ class @BaseDisplay
           b.margin.left + "," +
           b.margin.top + ")");
 
-    @brush = d3.svg.brush()
-      .x(@xAxis.domain.rangeband)
-      .extent([0,0])
-      .on("brush", ->
-        console.log("brushed")
-      )
-
   drawAxis: =>
     @drawAxisX()
     @drawAxisY()
 
   drawAxisX: =>
-    @view.append("g")
+    @display_axis_x = @view.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + @boundaries.height + ")")
-      .call(@xAxis.axis);
+      .attr("transform", "translate(0," + @boundaries.height + ")");
+    @display_axis_x.call(@xAxis.axis);
+
+  redrawAxisX: =>
+    @display_axis_x.call(@xAxis.axis);
 
   drawAxisY: =>
-    @view.append("g")
-      .attr("class", "y axis")
-      .call(@yAxis.axis);
+    @display_axis_y = @view.append("g")
+      .attr("class", "y axis");
+    @display_axis_y.call(@yAxis.axis);
+
+  redrawAxisY: (bottom, top) =>
+    scale = @yAxis.axis.scale()
+    scale.domain(new Array(bottom, top))
+    @display_axis_y.call(@yAxis.axis);
 
   track_mouse: (value) =>
     _axis = @xAxis
@@ -332,7 +429,7 @@ class @BaseDisplay
       .attr("class", line.name)
       .append("path")
 
-      .attr("class", line.name + "-line line")
+      .attr("class", line.name + line.extension())
       .attr("stroke", line.color)
       .attr("d", return_function)
       .attr("stroke", line.color.color)
@@ -350,6 +447,29 @@ class @BaseDisplay
     .style("opacity", 0)
     .remove()
 
+class @BrushDisplay extends BaseDisplay
+  constructor: (options) ->
+    super(options)
+    @drawAxis()
+    b = @boundaries
+    # @brush = d3.svg.brush()
+    #   .x(@xAxis.domain.rangeband)
+    #   .extent([0,0])
+    #   .on("brush", ->
+    #     console.log("brushed")
+    #   )
+
+    @svg_brush = d3.select(@select).append("svg")
+      .attr("width", b.total_width)
+      .attr("height", b.total_height)
+      .attr("class", "brush")
+      .attr(
+        "transform",
+        "translate(" +
+        b.margin.left + "," +
+        b.margin.top + ")"
+      );
+
 class @Display extends BaseDisplay
   constructor: (options) ->
     super(options)
@@ -361,24 +481,13 @@ class @NavDisplay extends BaseDisplay
     @drawAxisX()
 
 
-class @Line
+class @BaseLine
   constructor: (options={}) ->
     {@name, @valuesX, @valuesY, @domainX, @domainY} = options
     @_show = options.show ? !options.hide ? true
     @interpolation = options.interpolation ? "basis"
     @color = options.color ? new Color("black")
-    @setup()
 
-  setup: =>
-    funcX = (d,i) ->
-      @domainX.domain(@valuesX[i])
-    funcY = (d,i) ->
-      @domainY.domain(@valuesY[i])
-    @line =
-      d3.svg.line()
-        .interpolate("basis")
-        .x(funcX)
-        .y(funcY)
 
   className: =>
     "." + @name
@@ -388,6 +497,9 @@ class @Line
 
   fullClassSpecifier: =>
     @className() + " " + @classNameLine()
+
+  extension: =>
+    "-line line"
 
   @difference: (line1, line2, with_offset = true) ->
     return "doesn't match" if line1.length != line2.length
@@ -438,6 +550,71 @@ class @Line
     for key, value of options
       copy[key] = value
     return copy
+
+class @Line extends BaseLine
+  constructor: (options={}) ->
+    super(options)
+    @setup()
+
+  setup: =>
+    funcX = (d,i) ->
+      @domainX.domain(@valuesX[i])
+    funcY = (d,i) ->
+      @domainY.domain(@valuesY[i])
+    @line =
+      d3.svg.line()
+        .interpolate("basis")
+        .x(funcX)
+        .y(funcY)
+
+class @Block extends BaseLine
+  constructor: (options={}) ->
+    super(options)
+    @setup()
+
+  setup: =>
+    funcX = (d, i) ->
+      @domainX.domain(@valuesX[i])
+    funcY0 = (d,i) ->
+      @domainY.domain(@valuesY[0])
+    funcY1 = (d, i) ->
+      @domainY.domain(@valuesY[1])
+    @line = 
+      d3.svg.area()
+        .interpolate("basis")
+        .x(funcX)
+        .y0(funcY0)
+        .y1(funcY1)
+
+  getRangeX: =>
+    return @valuesX
+
+  getRangeY: =>
+    return @valuesY
+
+
+class @AreaLine extends BaseLine
+  constructor: (options={}) ->
+    super(options)
+    @setup()
+
+  setup: =>
+    funcX = (d,i) ->
+      @domainX.domain(@valuesX[i])
+    funcY0 = (d,i) ->
+      @domainY.domain(0)
+    funcY1 = (d,i) ->
+      @domainY.domain(@valuesY[i])
+    @line =
+      d3.svg.area()
+        .interpolate("basis")
+        .x(funcX)
+        .y0(funcY0)
+        .y1(funcY1)
+
+  extension: =>
+    "-line line area"
+
 
 class @DiffLine extends Line
   constructor: (options={}) ->
@@ -507,9 +684,51 @@ class @Color
 
 
 
+class @Accumulator
+  constructor: (options={}) ->
+    @arrays = options.arrays ? []
+
+  addArray: (array) =>
+    @arrays.push(array)
+
+  addArrays: (arrays = []) =>
+    for array in arrays 
+      @addArray(array)
+
+  resetArrays: =>
+    arrays = []
+
+  getAccumulatedData: =>
+    accumulatedData = []
+    for angle, i in window.m.data_angles.angles
+      accumulatedData[i] = 0
+      for array in @arrays
+        accumulatedData[i] += array[i]
+    return accumulatedData
 
 
+class @ErrorAccumulator
+  constructor: (options = {}) ->
+    @runs = options.runs ? []
 
+  addRun: (run) =>
+    @runs.push(run)
 
+  addRuns: (runs = []) =>
+    for run in runs 
+      @addRun(run)
+
+  resetRuns: =>
+    runs = []
+
+  getAccumulatedData: =>
+    accumulatedData = []
+    arrays = []
+    for run in @runs
+      arrays.push(Math.abs(window.m.measured_points.points - run.emulated_points.points))
+    for angle, i in window.m.data_angles.angles
+      for array in arrays
+        accumulatedData[i] += array[i]
+    return accumulatedData
 
 
