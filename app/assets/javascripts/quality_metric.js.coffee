@@ -46,7 +46,7 @@ class @Chi2 extends QualityMetric
       for val, i in selection.new_base
         if val.constructor == Number
           selection.differences[i] = Math.abs(val - simulated[i])
-          sum += Chi2.perform_single(val, simulated[i])
+          sum += Chi2.perform_single(simulated[i], val)
         if val.constructor == Array
           sim = simulated[i]
           if sim >= val[0] and sim <= val[1]
@@ -83,8 +83,24 @@ class @Chi2 extends QualityMetric
 
 
 class @SelectionHolder
+  _current = null
   constructor: (options={}) ->
     {@inclusions, @exclusions} = options
+    @list = []
+    @temporary = null
+
+  addSelection: (selection) =>
+    @list.push(selection)
+    @setCurrent(selection)
+
+  getCurrent: =>
+    return _current
+
+  setCurrent: (selection) =>
+    _current = selection
+
+  getCurrentBase: =>
+    _current.getBase()
 
 
 
@@ -93,6 +109,7 @@ class @BaseSelection
     {@exclusions, @measured, @angles} = options
     @setup()
     @differences = []
+    @blocks = @exclusions.getBlocks()
 
   setup: =>
     @new_base = @measured.slice()
@@ -122,6 +139,8 @@ class @BaseSelection
   addDiff: (diff) =>
     @differences.push()
 
+  getBase: =>
+    return @
 
 
   @factory: (exclusions, measured = window.m.measured_points.points, angles = window.m.data_angles.angles) ->
@@ -153,6 +172,31 @@ class @Selection
       arr.push(pos)
     return arr
 
+  getBase: =>
+    return @base_selection
+
+
+class @ExclusionsList
+  _current = null
+  constructor: (options={}) ->
+    @list = []
+    exclusions = new Exclusions()
+    @addExclusions(exclusions)
+
+  addExclusions: (exclusions) =>
+    @list.push(exclusions)
+    @setCurrent(exclusions)
+
+  getCurrent: =>
+    return _current
+
+  setCurrent: (exclusions) =>
+    _current = exclusions
+
+  addBlockToCurrent: (block) =>
+    @getCurrent().addBlock(block)
+
+
 
 class @Exclusions
   constructor: (options={}) ->
@@ -168,6 +212,9 @@ class @Exclusions
       rangesY.push(y)
     obj = {rangesX: rangesX, rangesY: rangesY}
     return obj
+
+  getBlocks: =>
+    @blocks
 
 
   addBlock: (block) =>

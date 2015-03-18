@@ -14,7 +14,9 @@ Rails.application.routes.draw do
       member do
         get "remotecall"
         get "get_runs"
+        get "get_initial_runs"
         post "remotepost"
+        post "alternative_estfunc"
       end
     end
   end

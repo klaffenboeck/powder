@@ -13,6 +13,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
+//= require bootstrap/dist/js/bootstrap.min
 //= require d3/d3.min
 //= require knockout/dist/knockout
 //= require numbers.js/src/numbers.min

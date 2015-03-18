@@ -10,7 +10,14 @@ class @EstimationFunction
   compute: ->
     return "computation going on"
 
+class @EstimationFunctionList
+  constructor: (options={}) ->
+    @functions = options.functions ? []
 
+  @list = @functions
+
+  addFunction: (func) =>
+    @functions.push(func)
 
 class @GaussianProcessModel extends EstimationFunction
   constructor: (options={}) ->

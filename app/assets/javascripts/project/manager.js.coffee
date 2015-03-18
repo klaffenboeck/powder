@@ -6,7 +6,8 @@
 
 class @Manager
   constructor: (options = {}) ->
-    {@parameter_space, @name, @description, @accuracy, @measured_points, @data_angles, @run_list, @runs, @estimation_function} = options
+    {@parameter_space, @name, @description, @accuracy, @measured_points, @data_angles, @run_list, @runs} = options
+    @orig_estfunc_contents = options.estimation_function
     @setup()
 
   setup: ->
@@ -32,10 +33,18 @@ class @Manager
       select: "#detailview-1"
       entries: [@linelist.measured, @linelist.emulated, @linelist.error, @linelist.difference]
     @legend.drawEntries()
-    @func = EstimationFunction.factory(@estimation_function)
+    console.log(@orig_estfunc_contents)
+    @func = EstimationFunction.factory(@orig_estfunc_contents)
+
+    @estfunc_list = new EstimationFunctionList()
+    @estfunc_list.addFunction(@func)
+
     @navigation = new Navigation({estimation_function: @func})
     @navigation.estimate_all_lines()
     @navigation.estimate_preview()
+
+    @exclusions_list = new ExclusionsList()
+    @selection_holder = new SelectionHolder()
 
     @errorchart = new ErrorChart()
 

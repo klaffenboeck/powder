@@ -2,6 +2,7 @@
 
 class @Chart
   @name = "unspecified"
+  _blockCounter = 0
 
   addLine: (line) =>
     @display.addLine(line)
@@ -23,8 +24,18 @@ class @Chart
   createBlock: (params) =>
     valuesX = [params[0][0], params[1][0]]
     valuesY = [params[0][1], params[1][1]]
-    block = new Block({domainX: @domainX, domainY: @domainY, valuesX: valuesX, valuesY: valuesY, name: "block1"})
+    block = new Block({domainX: @domainX, domainY: @domainY, valuesX: valuesX, valuesY: valuesY, name: "block" + _blockCounter})
+    @addLine(block)
+    _blockCounter += 1
+    @drawLines()
+    window.m.exclusions_list.addBlockToCurrent(block)
+    @brush.extent([[0,0],[0,0]])
+    @display.svg_brush
+      .call(@brush)
     return block
+
+  createCurrentBlock: =>
+    @createBlock(@brush.extent())
 
 
 
@@ -62,11 +73,14 @@ class @LineChart extends Chart
       .extent([[0,0],[0,0]])
       .on("brush", =>
         @brush.extent()
-        console.log(@brush.event)
       )
       .on("brushend", =>
         console.log(@brush.extent())
-        console.log(@checkBrush())
+        if @checkBrush()
+          $(".set-exclude").removeClass("disabled")
+        else
+          $(".set-exclude").addClass("disabled")
+
       )
 
     #@display.view.call(@brush)
@@ -585,6 +599,9 @@ class @Block extends BaseLine
         .x(funcX)
         .y0(funcY0)
         .y1(funcY1)
+
+  extension: =>
+    "-line line area block"
 
   getRangeX: =>
     return @valuesX

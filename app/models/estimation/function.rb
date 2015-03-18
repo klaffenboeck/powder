@@ -5,6 +5,7 @@ class Estimation::Function < ActiveRecord::Base
   belongs_to :raw_data, class_name: "Estimation::RawData", dependent: :destroy
   has_one :run_list, as: :run_list_holder, class_name: "MathModel::RunList", dependent: :destroy
   attr_accessor :input_params_list, :result_vector, :corr_response, :inv_var_matrix
+  attr_writer :mu, :sig2, :theta
   after_initialize :further_setup
 
   delegate :measured_points, :parameter_space, :adapter, to: :project_setting
@@ -51,6 +52,30 @@ class Estimation::Function < ActiveRecord::Base
       return func
     end
   end
+
+  def create_alternative(result_vector)
+    p "BEFORE CONN"
+    conn = Rserve::Connection.new
+    p "AFTER CONN"
+    conn.eval("library(mlegp);")
+    p "AFTER MLEGP"
+    r_matrix = Rserve::REXP::Wrapper.wrap(self.run_list.input_matrix)
+    r_vector = Rserve::REXP::Wrapper.wrap(result_vector)
+    p "BEFORE ASSIGNMENTS"
+    conn.assign("matrix", r_matrix)
+    conn.assign("vector", r_vector)
+    p "AFTER ASSIGNMENTS"
+    p result_vector
+    output = conn.eval("output <- mlegp(matrix, vector)")
+    p "AFTER OUTPUT"
+    r_output = output.to_ruby
+    self.raw_data.mu = r_output["mu"][0,0]
+    self.raw_data.sig2 = r_output["sig2"]
+    self.raw_data.inv_var_matrix = r_output["invVarMatrix"]
+    self.raw_data.theta = r_output["beta"]
+    return self
+  end
+
 
   def generate_raw_data
     self.raw_data = Estimation::RawData.factory(cols: parameter_space.size, rows: project_setting.accuracy)

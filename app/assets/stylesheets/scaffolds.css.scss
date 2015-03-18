@@ -430,6 +430,14 @@ td.run-id {
   shape-rendering: crispEdges;
 }
 
+.area.block {
+  stroke: red;
+  stroke-opacity: .6;
+  fill: red;
+  fill-opacity: .2;
+  shape-rendering: crispEdges;
+}
+
 .error .brush {
   .resize {
     &.n, &.s {
@@ -440,3 +448,24 @@ td.run-id {
     cursor: ew-resize !important;
   }
 }   
+
+td.thumbnail {
+  border: none !important;
+  border-radius: 0;
+  margin-bottom: 0px;
+  padding: 0;
+}
+
+
+.set-exclude {
+  position: absolute;
+  right: 0;
+  top: 100px;
+}
+
+.create-overview {
+  position: absolute;
+  right: 0;
+  top: 140px;
+  color: white !important;
+}

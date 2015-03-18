@@ -36,10 +36,29 @@ class Project::SettingsController < ApplicationController
     render json: run
   end
 
+  def alternative_estfunc
+    #parameters = project_setting_params
+    result_vector = params[:parameters]
+    rv = result_vector.map do |r|
+      r = r.to_f
+    end
+    id = params[:id].to_i
+    manager = Project::Manager.setup(id)
+    func = manager.estimation_function
+    newfunc = func.create_alternative(rv)
+    render json: newfunc
+  end
+
   def get_runs
     manager = Project::Manager.setup(params[:id].to_i)
     runs = manager.run_list.runs
     render json: runs, root: "runs"
+  end
+
+  def get_initial_runs
+    manager = Project::Manager.setup(params[:id].to_i)
+    runs = manager.estimation_function.run_list.runs
+    render json: runs, root: "initial_runs"
   end
 
   private 
@@ -55,5 +74,9 @@ class Project::SettingsController < ApplicationController
   def project_setting_params
     params.require(:parameters).permit!
     #params[:project_setting]
+  end
+
+  def result_vector_params
+    params.require(:result_vector).permit!
   end
 end
