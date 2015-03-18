@@ -47,7 +47,7 @@ ready = function() {
       samples = m.generateSamples();
       window.m.complex_view_holder.samples = window.m.samples;
       m.complex_view_holder.newProjectionView();
-      //oldviews.hide();
+      oldviews.hide();
 
     });
     e.preventDefault();

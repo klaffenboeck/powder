@@ -218,10 +218,14 @@ class @WebglLegend2
     _slider = @slider
     $("#gl_legend").click( (e) ->
       posX = $(@).offset().left
+      posY = $(@).offset().top
       # alert(e.pageX - posX)
-      pos = (e.pageX - posX)
+      hpos = (e.pageX - posX)
+      vpos = (e.pageY - posY)
+      console.log(hpos)
+      console.log(vpos)
       # colorvalue = _slider.getColorAt(pos / $("#webgl").width())
-      _slider.addHandle({position: pos, autocolor: true})
+      _slider.addHandle({position: hpos, autocolor: true})
     )
 
 

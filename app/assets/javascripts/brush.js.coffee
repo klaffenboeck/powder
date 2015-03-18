@@ -21,6 +21,7 @@ class @Slider
 
     @axis = new Axis
       domain: @domain
+      #orientation: "right"
       ticks: 0
 
     @svg = d3.select(@select).append("svg")

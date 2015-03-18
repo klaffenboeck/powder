@@ -222,8 +222,9 @@ g.peak {
 }
 
 #detailview-1 {
-  float: right;
+  float: left;
   position: relative;
+  width: 640px;
   .main, .error {
     position: relative;
     .brush {
@@ -263,16 +264,19 @@ g.peak {
 #navigation, #comparison {
   height: 400px;
   overflow-y: scroll;
-  float: left;
+  
 }
 
 #navigation {
     width: 450px;
+    float: right;
 }
 
 #comparison {
   padding-right: 20px;
-  position: relative;
+  position: absolute;
+  top: 430px;
+  left: 580px;
 }
 
 .muted {
@@ -309,6 +313,10 @@ g.peak {
 
 #webgl {
   // background-color: green
+}
+
+#gl_legend {
+
 }
 
 #brush {
