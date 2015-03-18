@@ -109,4 +109,15 @@ class @Manager
       @samples.computeResults({estfunc: func})
     @samples
 
+  generateNewSamples: (options={}) =>
+    amount = options.amoutn ? 25000
+    
+    dims = options.dims ? Object.keys(@parameter_space.content).length
+
+    sampling = Hybrid.sample(amount, dims, @parameter_space)
+    func = @navigation.estimation_function
+    results = sampling.computeResults({estfunc: func})
+    return sampling
+
+
 
