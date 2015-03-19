@@ -291,9 +291,18 @@ g.peak {
 }
 
 #brush {
-  width: 500px;
-  height: 20px;
+  width: 10px;
+  height: 500px;
   // border: 1px solid gray;
+  position: relative;
+  float: right;
+}
+
+#legend-brush-group {
+  position: relative;
+  margin-left: 150px;
+  width: 65px;
+  height: 500px;
 }
 
 .handle:hover {
@@ -311,17 +320,6 @@ g.peak {
 
 }
 
-#webgl {
-  // background-color: green
-}
-
-#gl_legend {
-
-}
-
-#brush {
-  position: relative;
-}
 
 #detailview-1 {
   .main {

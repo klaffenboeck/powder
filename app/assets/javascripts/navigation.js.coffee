@@ -192,7 +192,7 @@ class @ComplexViewHolder
     slides = []
     @width = options.width ? 200
 
-  newProjectionView: (x = 0, y = 2) =>
+  newProjectionView: (x = 0, y = 3) =>
     # $("#webgl-area").prepend(@getTemplate())
     view = d3.select("#webgl-area")
     id = "complex-view-" + @getSlideCount()

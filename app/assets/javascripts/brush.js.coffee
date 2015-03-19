@@ -9,8 +9,8 @@ class @Slider
   constructor: (options={}) ->
     {@select, @legend} = options
     @boundaries = new Boundaries
-      width: @legend.slider_value
-      height: 100
+      height: @legend.slider_value
+      width: 50
 
     _new_handle = false
 
@@ -37,7 +37,7 @@ class @Slider
       .attr("width", @boundaries.width)
 
     @slideraxis = @slider.call(@axis.axis)
-    @slideraxis.attr("transform", "translate(0,7)")
+    @slideraxis.attr("transform", "translate(2,0)")
 
     @slider.on("mousedown", =>
       @newHandle()
@@ -57,7 +57,7 @@ class @Slider
       min: 0
       max: 1
       scaletype: "linear"
-      width: @legend.slider_value
+      height: @legend.slider_value
       # height: 20
 
   redrawSubscribers: =>
@@ -72,7 +72,8 @@ class @Slider
     _color = undefined # options.color ? new Color("black")
     _autocolor = options.autocolor ? false
     if _autocolor
-      _color = @getColorAt(options.position / @legend.slider_value).toString()
+      pos = @legend.slider_value - options.position
+      _color = @getColorAt(pos / @legend.slider_value).toString()
     else 
       _color = options.color ? new Color("black")
     _handle = new Handle
@@ -80,6 +81,7 @@ class @Slider
       color: _color
     _handle.reposition(options.position) if options.position
     # _handle.changeColor(@getColorAt(_handle.value())) if _autocolor
+    _handle.setDirection("left")
     @handles.push(_handle)
     @resort()
     @redrawSubscribers()
@@ -189,16 +191,17 @@ class @Handle
     _offset = 0
     _start = 0
     @brush = d3.svg.brush()
-      .x(@domain.domain)
+      .y(@domain.domain)
       .extent([0,0])
       .on("brushstart", =>
-        _offset = @getPosition() - d3.mouse(@overlay)[0]
+        _offset = @getPosition() - d3.mouse(@overlay)[1]
         _start = @getPosition()
         # @slider.noNewHandle()
         $(".picker").spectrum("hide")
       )
       .on("brush", =>
-        @reposition(d3.mouse(@overlay)[0] + _offset) 
+        @reposition(d3.mouse(@overlay)[1] + _offset) 
+        #console.log(d3.mouse(@overlay))
         # @slider.noNewHandle()
         @slider.resort()
         @slider.redrawSubscribers()
@@ -258,10 +261,11 @@ class @Handle
     @handle.attr("fill", @color.color.toString())
 
   getPosition: =>
-    @brush.extent()[0]
+    @brush.extent()[1]
 
   outOfRange: =>
-    if @getPosition() < -1 or @getPosition() > @slider.domain.width + 1
+
+    if @getPosition() < -1 or @getPosition() > @slider.domain.height + 1
       return true
     else 
       return false
@@ -281,8 +285,9 @@ class @Handle
 
   reposition: (pos) =>
     @brush.extent([pos, pos])
+    console.log(@brush.extent())
     @handle.attr("transform", =>
-      "translate(" + pos + ",0)"
+      "translate(7," + pos + ")"
     )
 
   destroy: =>

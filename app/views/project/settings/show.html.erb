@@ -71,11 +71,13 @@ void main(void) {
   <div id="navigation"></div>
   <div id="comparison"></div>
 
-  <div id="webgl-area" style="position: absolute; top: 80px; left: 750px">
+  <div id="webgl-area" style="position: absolute; top: 80px; left: 720px">
     <!--<canvas id="projection-view" width="200" height="200"></canvas>-->
     <div style="clear: both"></div>
-    <canvas id="gl_legend" width="500" height="50" data-slider-max="500"></canvas>
-    <div id="brush"></div>
+    <div id="legend-brush-group">
+      <canvas id="gl_legend" width="40" height="400" data-slider-max="400"></canvas>
+      <div id="brush"></div>
+    </div>
   </div>
 </div>
 <%= render "inline_js" %>

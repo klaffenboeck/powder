@@ -49,10 +49,10 @@ class @Manager
     @errorchart = new ErrorChart()
 
     @gl_legend = new WebglLegend2({select: "#gl_legend"})
-    @gl_legend.addHandle({color: "#0000ff", position: 100})
-    @gl_legend.addHandle({color: "#ff0000", position: 350})
-    @gl_legend.addHandle({color: "#00ff00", position: 200})
-    @gl_legend.addHandle({color: "#ffff00", position: 450})
+    @gl_legend.addHandle({color: "#0000ff", position: 50})
+    @gl_legend.addHandle({color: "#ff0000", position: 150})
+    @gl_legend.addHandle({color: "#00ff00", position: 250})
+    @gl_legend.addHandle({color: "#ffff00", position: 1})
     @sampling = @generateSamples()
     @complex_view_holder = new ComplexViewHolder
       domains: @navigation.getAllDomains()

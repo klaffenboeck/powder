@@ -45,7 +45,7 @@ ready = function() {
       window.m.navigation.estimation_function = func;
       oldviews = $(".complex-view");
       samples = m.generateSamples();
-      window.m.complex_view_holder.samples = window.m.samples;
+      window.m.complex_view_holder.sampling = window.m.samples;
       m.complex_view_holder.newProjectionView();
       oldviews.hide();
 

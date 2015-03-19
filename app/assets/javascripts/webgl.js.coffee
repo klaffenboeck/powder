@@ -168,10 +168,14 @@ class @WebglLegend2
 
     @gl.bindBuffer @gl.ARRAY_BUFFER, @gl.positionBuffer
     @gl.bufferData @gl.ARRAY_BUFFER, new Float32Array([
+      # -1.0, -1.0,
+      # +1.0, -1.0,
+      # +1.0, +1.0,
+      # -1.0, +1.0
       -1.0, -1.0,
-      +1.0, -1.0,
+      -1.0, +1.0,
       +1.0, +1.0,
-      -1.0, +1.0
+      +1.0, -1.0
     ]), @gl.STATIC_DRAW
 
     # Bind the position buffer to the position attribute.
@@ -225,14 +229,17 @@ class @WebglLegend2
       console.log(hpos)
       console.log(vpos)
       # colorvalue = _slider.getColorAt(pos / $("#webgl").width())
-      _slider.addHandle({position: hpos, autocolor: true})
+      _slider.addHandle({position: vpos, autocolor: true})
     )
 
 
 class @ProjectionView
   _current_type = undefined
   constructor: (options = {}) ->
+    console.log("PROJECTION_VIEW CONSTRUCTOR")
+
     {@sampling, @x, @y, @slider, @select, @holder, @width} = options
+    console.log(@sampling.samples.length)
     @number_of_bins = @sampling.number_of_bins
     @intersection_points = {results: [], samples: [], normal_samples: []}
     @value_width = 1 # to be changed
@@ -244,6 +251,7 @@ class @ProjectionView
     @gl = SetupWebGL.setupGL(@gl)
     @slider.subscribe(@)
     @hoverPosition()
+    console.log(@sampling.samples.length)
 
   redraw: =>
     @gl.clear(@gl.COLOR_BUFFER_BIT)
@@ -288,13 +296,18 @@ class @ProjectionView
     _current_type = "max"
 
   getMaxima: (x = null, y = null) =>
+    console.log(@sampling.samples.length)
     @setX(x) if x != null
     @setY(y) if y != null
     @drawAxis(x, y)
+
     @setToMax()
+
     @currentValues = @sampling.getBins(@x, @y).getMaxima()
     @generateTiles()
     @redraw()
+    console.log(@sampling.samples.length)
+
 
   getMinima: (x = null, y = null) =>
     @setX(x) if x != null
@@ -307,7 +320,9 @@ class @ProjectionView
 
   generateTiles: =>
     @tile_list = []
+    console.log("Before generateIntersectionPoints: " + @sampling.samples.length)
     @generateIntersectionPoints()
+    console.log("After generateIntersectionPoints: " + @sampling.samples.length)
     for y_counter in [0..@number_of_bins - 1]
       for x_counter in [0..@number_of_bins - 1]
         tile = @createTile(x_counter, y_counter)
@@ -324,7 +339,9 @@ class @ProjectionView
         value = @calculateIntersectionPoint(x_counter, y_counter, bottom_left, bottom_right, top_left, top_right)
         intersection_points.push(value)
     @intersection_points.normal_samples = intersection_points
+    console.log("Before mapping: " + @sampling.samples.length)
     @intersection_points.samples = @sampling.map(null, intersection_points)
+    console.log("After mapping: " + @sampling.samples.length)
     @intersection_points.results = @sampling.computeResults({samples: @intersection_points.samples})
     return @intersection_points
 
