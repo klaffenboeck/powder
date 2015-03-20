@@ -11,8 +11,7 @@ class @Sampling
 
   map: (ps = null, ns = null) =>
     @parameter_space = ps if ps
-    console.log("ParameterSpace: ")
-    console.log(@parameter_space)
+
     normal_samples = ns ? @normal_samples
     parameter_space = ps ? @parameter_space
     _return_array = []
@@ -28,6 +27,7 @@ class @Sampling
         inner_array.push(mapped_value)
       _return_array.push(inner_array)
     @samples = _return_array if ps
+    # if you remove the previous if, it will overwrite the samples while generating the tiles
     return _return_array
 
 

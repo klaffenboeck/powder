@@ -226,8 +226,8 @@ class @WebglLegend2
       # alert(e.pageX - posX)
       hpos = (e.pageX - posX)
       vpos = (e.pageY - posY)
-      console.log(hpos)
-      console.log(vpos)
+      # console.log(hpos)
+      # console.log(vpos)
       # colorvalue = _slider.getColorAt(pos / $("#webgl").width())
       _slider.addHandle({position: vpos, autocolor: true})
     )
@@ -236,12 +236,11 @@ class @WebglLegend2
 class @ProjectionView
   _current_type = undefined
   constructor: (options = {}) ->
-    console.log("PROJECTION_VIEW CONSTRUCTOR")
 
     {@sampling, @x, @y, @slider, @select, @holder, @width} = options
-    console.log(@sampling.samples.length)
+
     @number_of_bins = @sampling.number_of_bins
-    @intersection_points = {results: [], samples: [], normal_samples: []}
+    @intersection_points = {results: [], samples: [], normal_samples: [], points: []}
     @value_width = 1 # to be changed
     @tile_width = @value_width / @number_of_bins
     @max_weight_factor = Math.sqrt(Math.pow(@tile_width, 2) * 2)
@@ -251,11 +250,16 @@ class @ProjectionView
     @gl = SetupWebGL.setupGL(@gl)
     @slider.subscribe(@)
     @hoverPosition()
-    console.log(@sampling.samples.length)
+    @addedVertices = 0
+    @boxPositions = []
+
 
   redraw: =>
+    console.log("REDRAW")
     @gl.clear(@gl.COLOR_BUFFER_BIT)
     # @gl.uniform1f(@gl.sizeUniform, 3.0)
+
+
 
     @gl.bindBuffer @gl.ARRAY_BUFFER, @gl.positionBuffer
     @gl.bufferData @gl.ARRAY_BUFFER, new Float32Array(
@@ -281,7 +285,48 @@ class @ProjectionView
     @gl.vertexAttribPointer @gl.colorAttribute, 1, @gl.FLOAT, false, 0, 0
 
     # Draw the square!
-    @gl.drawArrays @gl.TRIANGLES, 0, 2400
+    @gl.drawArrays @gl.TRIANGLES, 0, 4800
+
+
+
+    # STARTING FOR HIGHLIGHTING QUADS
+    @gl.bindBuffer @gl.ARRAY_BUFFER, @gl.positionBuffer
+    @gl.bufferData @gl.ARRAY_BUFFER, new Float32Array(
+      #[
+      # -0.5, -0.5,
+      # 0.5, -0.5,
+      # 0.5, -0.5,
+      # 0.5, 0.5,
+      # 0.5, 0.5,
+      # -0.5, 0.5,
+      # -0.5, 0.5,
+      # -0.5, -0.5
+      #]
+      @boxPositions      
+    ), @gl.STATIC_DRAW
+
+    # Bind the position buffer to the position attribute.
+    @gl.getAttribLocation(@gl.program, "a_position")
+    @gl.enableVertexAttribArray @gl.positionAttribute
+    @gl.vertexAttribPointer @gl.positionAttribute, 2, @gl.FLOAT, false, 0, 0
+
+    @gl.uniform1fv(@gl.u_step, @slider.getCompleteValueArray())
+    @gl.uniform4fv(@gl.u_colorValues, @slider.getCompleteColorArray())
+
+    @gl.bindBuffer @gl.ARRAY_BUFFER, @gl.colorBuffer
+    @gl.bufferData @gl.ARRAY_BUFFER, new Float32Array(
+      [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+    ), @gl.STATIC_DRAW
+
+    # Bind the color buffer to the color attribute.
+    @gl.cattribute = @gl.getAttribLocation(@gl.program, "a_color")
+    @gl.enableVertexAttribArray @gl.cattribute
+    @gl.vertexAttribPointer @gl.colorAttribute, 1, @gl.FLOAT, false, 0, 0
+
+    # Draw the square!
+    console.log(@addedVertices)
+    @gl.drawArrays @gl.LINES, 0, @addedVertices
+    
 
   setX: (x) =>
     @x = x unless x == null
@@ -296,17 +341,14 @@ class @ProjectionView
     _current_type = "max"
 
   getMaxima: (x = null, y = null) =>
-    console.log(@sampling.samples.length)
     @setX(x) if x != null
     @setY(y) if y != null
     @drawAxis(x, y)
-
     @setToMax()
-
     @currentValues = @sampling.getBins(@x, @y).getMaxima()
     @generateTiles()
     @redraw()
-    console.log(@sampling.samples.length)
+
 
 
   getMinima: (x = null, y = null) =>
@@ -320,9 +362,7 @@ class @ProjectionView
 
   generateTiles: =>
     @tile_list = []
-    console.log("Before generateIntersectionPoints: " + @sampling.samples.length)
     @generateIntersectionPoints()
-    console.log("After generateIntersectionPoints: " + @sampling.samples.length)
     for y_counter in [0..@number_of_bins - 1]
       for x_counter in [0..@number_of_bins - 1]
         tile = @createTile(x_counter, y_counter)
@@ -330,19 +370,30 @@ class @ProjectionView
 
   generateIntersectionPoints: =>
     intersection_points = []
+    normal_samples = []
     for y_counter in [0..@number_of_bins]
       for x_counter in [0..@number_of_bins]
-        bottom_left = @getNormalSamplesAtPosition(x_counter - 1, y_counter - 1)
-        bottom_right = @getNormalSamplesAtPosition(x_counter, y_counter - 1)
-        top_left = @getNormalSamplesAtPosition(x_counter - 1, y_counter)
-        top_right = @getNormalSamplesAtPosition(x_counter, y_counter)
-        value = @calculateIntersectionPoint(x_counter, y_counter, bottom_left, bottom_right, top_left, top_right)
-        intersection_points.push(value)
-    @intersection_points.normal_samples = intersection_points
-    console.log("Before mapping: " + @sampling.samples.length)
-    @intersection_points.samples = @sampling.map(null, intersection_points)
-    console.log("After mapping: " + @sampling.samples.length)
+        bottom_left = @getObjectAtPosition(x_counter - 1, y_counter - 1)
+        bottom_right = @getObjectAtPosition(x_counter, y_counter - 1)
+        top_left = @getObjectAtPosition(x_counter - 1, y_counter)
+        top_right = @getObjectAtPosition(x_counter, y_counter)
+        point = @calculateIntersectionPoint(x_counter, y_counter, bottom_left, bottom_right, top_left, top_right)
+        normal_sample = point.normal_sample
+        intersection_points.push(point)
+        normal_samples.push(normal_sample)
+    @intersection_points.normal_samples = normal_samples
+    @intersection_points.samples = @sampling.map(null, normal_samples)
     @intersection_points.results = @sampling.computeResults({samples: @intersection_points.samples})
+    
+    for point, i in intersection_points
+      point.sample = @intersection_points.samples[i]
+      point.result = @intersection_points.results[i]
+    #   point = new IntersectionPoint
+    #     sample: @intersection_points.samples[i]
+    #     normal_sample: @intersection_points.normal_samples[i]
+    #     result: @intersection_points.results[i]
+    #   @intersection_points.list.push(point)
+    @intersection_points.points = intersection_points
     return @intersection_points
 
   getAllDrawingPositions: =>
@@ -399,6 +450,10 @@ class @ProjectionView
       normal_sample: @intersection_points.normal_samples[pos]
     }
 
+  getIntersectionPointAtPosition: (x, y) =>
+    pos = @_calculateIArrayPosition(x, y)
+    @intersection_points.points[pos]
+
   getNormalSamplesAtPosition: (x, y) =>
     pos = @calculateArrayPosition(x,y)
     return @currentValues.normal_samples[pos] if pos != null
@@ -413,17 +468,26 @@ class @ProjectionView
   createTile: (x, y) =>
     tile = new Tile
       # center: @getObjectAtPosition(x, y)
-      bottom_left: @getIObjectAtPosition(x, y)
-      bottom_right: @getIObjectAtPosition(x + 1, y)
-      top_left: @getIObjectAtPosition(x, y + 1)
-      top_right: @getIObjectAtPosition(x + 1, y + 1)
+      # bottom_left: @getIObjectAtPosition(x, y)
+      # bottom_right: @getIObjectAtPosition(x + 1, y)
+      # top_left: @getIObjectAtPosition(x, y + 1)
+      # top_right: @getIObjectAtPosition(x + 1, y + 1)
+      bottom_left: @getIntersectionPointAtPosition(x, y)
+      bottom_right: @getIntersectionPointAtPosition(x + 1, y)
+      top_left: @getIntersectionPointAtPosition(x, y + 1)
+      top_right: @getIntersectionPointAtPosition(x + 1, y + 1)
       x: @x
       y: @y
+      base: @getObjectAtPosition(x, y)
     return tile
 
-  calculateIntersectionPoint: (centerPosX, centerPosY, bottom_left, bottom_right, top_left, top_right) =>
+  calculateIntersectionPoint: (centerPosX, centerPosY, obj_bottom_left, obj_bottom_right, obj_top_left, obj_top_right) =>
     centerX = centerPosX * @tile_width
     centerY = centerPosY * @tile_width
+    bottom_left = obj_bottom_left.normal_sample
+    bottom_right = obj_bottom_right.normal_sample
+    top_left = obj_top_left.normal_sample
+    top_right = obj_top_right.normal_sample
     bl = [centerX - bottom_left[@x], centerY - bottom_left[@y]] if bottom_left
     br = [bottom_right[@x] - centerX, centerY - bottom_right[@y]] if bottom_right
     tl = [centerX - top_left[@x], top_left[@y] - centerY] if top_left
@@ -432,21 +496,47 @@ class @ProjectionView
     br_weight = @calculateWeight(br)
     tl_weight = @calculateWeight(tl)
     tr_weight = @calculateWeight(tr)
-    ret_array = []
+    weight = bl_weight + br_weight + tl_weight + tr_weight
+    normal_sample = []
     for pos in [0..@sampling.dims - 1]
       if pos == @x or pos == @y
-        ret_array.push(centerX) if pos == @x
-        ret_array.push(centerY) if pos == @y
+        normal_sample.push(centerX) if pos == @x
+        normal_sample.push(centerY) if pos == @y
       else
         bl_value = if bl_weight then bottom_left[pos] * bl_weight else 0
         br_value = if br_weight then bottom_right[pos] * br_weight else 0
         tl_value = if tl_weight then top_left[pos] * tr_weight else 0
         tr_value = if tr_weight then top_right[pos] * tr_weight else 0
-        weight = bl_weight + br_weight + tl_weight + tr_weight
         total = bl_value + br_value + tl_value + tr_value
         value = if weight then total / weight else total 
-        ret_array.push(value)
-    return ret_array
+        normal_sample.push(value)
+    # bl_value = if bl_weight then obj_bottom_left.result * bl_weight else 0
+    # br_value = if br_weight then obj_bottom_right.result * br_weight else 0
+    # tl_value = if tl_weight then obj_top_left.result * tr_weight else 0
+    # tr_value = if tr_weight then obj_top_right.result * tr_weight else 0
+    # total = bl_value + br_value + tl_value + tr_value
+    bl_value = if bl_weight then obj_bottom_left.result else 0
+    br_value = if br_weight then obj_bottom_right.result else 0
+    tl_value = if tl_weight then obj_top_left.result else 0
+    tr_value = if tr_weight then obj_top_right.result else 0
+    divider = 0
+    divider += 1 if bl_value
+    divider += 1 if br_value
+    divider += 1 if tl_value
+    divider += 1 if tr_value
+    total = (bl_value + br_value + tl_value + tr_value) / divider
+    # interpolated_value = if weight then total / weight else total 
+    interpolated_value = total 
+    point = new IntersectionPoint
+      normal_sample: normal_sample
+      interpolated_value: interpolated_value
+      bl: obj_bottom_left
+      br: obj_bottom_right
+      tl: obj_top_left
+      tr: obj_top_right
+
+    return point
+
 
   calculateWeight: (array = null) =>
     return @max_weight_factor - Math.sqrt(Math.pow(array[0], 2) + Math.pow(array[1], 2)) if array
@@ -472,18 +562,23 @@ class @ProjectionView
     y = undefined
     $(@select + " .complex-slide").mousemove( (e) ->
       window.m.navigation.show_preview_lines()
+      that.addedVertices = 8
       posX = $(@).offset().left
       posY = $(@).offset().top
       x = e.pageX - posX + 0.5
       y = e.pageY - posY + 0.5
       y = @width - y
       t = that.getSampleValue(x, y)
-      window.m.navigation.estimate_preview(t)
+      window.m.navigation.estimate_preview(t[0])
+      that.boxPositions = t[1]
+      that.redraw()
     ).mouseleave( (e) ->
       window.m.navigation.hide_preview_lines()
+      that.addedVertices = 0
+      that.redraw()
     ).mousedown( (e) ->
       vals = that.getSampleValue(x, y)
-      window.m.navigation.set_current_x_values(vals)
+      window.m.navigation.set_current_x_values(vals[0])
       window.m.navigation.estimate_all_lines()
     )
 
@@ -498,14 +593,19 @@ class @ProjectionView
     tile = @tile_list[tileX + tileY * @number_of_bins]
     inputX = (normalX - @tile_width * tileX) * @number_of_bins
     inputY = (normalY - @tile_width * tileY) * @number_of_bins
-    t = tile.getSampleAtNormalPosition(inputX, inputY)
+    sample = tile.getSampleAtNormalPosition(inputX, inputY)
+    bounds = tile.getBoundingPositions()
+    return [sample, bounds]
+
+  hoverBounds: (val) =>
+
 
    
 
 
 class @Tile
   constructor: (options = {}) ->
-    {@bottom_left, @bottom_right, @top_left, @top_right, @center, @x, @y} = options
+    {@bottom_left, @bottom_right, @top_left, @top_right, @center, @x, @y, @base} = options
     @center = options.center ? @calculateCenter()
     @all = {
       bottom_left: @bottom_left, 
@@ -520,25 +620,38 @@ class @Tile
 
   getDrawingPositions: =>
     array = [
-      # @bottom_left.map_position, @bottom_right.map_position, @center.map_position,
-      # @bottom_right.map_position, @top_right.map_position, @center.map_position,
-      # @top_right.map_position, @top_left.map_position, @center.map_position,
-      # @top_left.map_position, @bottom_left.map_position, @center.map_position
-      @top_left.map_position, @top_right.map_position, @bottom_right.map_position, 
-      @top_left.map_position, @bottom_left.map_position, @bottom_right.map_position
+      @bottom_left.map_position, @bottom_right.map_position, @center.map_position,
+      @bottom_right.map_position, @top_right.map_position, @center.map_position,
+      @top_right.map_position, @top_left.map_position, @center.map_position,
+      @top_left.map_position, @bottom_left.map_position, @center.map_position
+      # @top_left.map_position, @top_right.map_position, @bottom_right.map_position, 
+      # @top_left.map_position, @bottom_left.map_position, @bottom_right.map_position
+    ]
+    ret_array = [].concat.apply([], array)
+    return ret_array
+
+  getBoundingPositions: =>
+    array = [
+      @bottom_left.map_position, @bottom_right.map_position,
+      @bottom_right.map_position, @top_right.map_position,
+      @top_right.map_position, @top_left.map_position, 
+      @top_left.map_position, @bottom_left.map_position
     ]
     ret_array = [].concat.apply([], array)
     return ret_array
 
   getDrawingColorValues: =>
     array = [
-      # @bottom_left.result, @bottom_right.result, @center.result,
-      # @bottom_right.result, @top_right.result, @center.result,
-      # @top_right.result, @top_left.result, @center.result,
-      # @top_left.result, @bottom_left.result, @center.result
-      @top_left.result, @top_right.result, @bottom_right.result,
-      @top_left.result, @bottom_left.result, @bottom_right.result
+      @bottom_left.getResult(), @bottom_right.getResult(), @center.getResult(),
+      @bottom_right.getResult(), @top_right.getResult(), @center.getResult(),
+      @top_right.getResult(), @top_left.getResult(), @center.getResult(),
+      @top_left.getResult(), @bottom_left.getResult(), @center.getResult()
+      # @top_left.result, @top_right.result, @bottom_right.result,
+      # @top_left.result, @bottom_left.result, @bottom_right.result
     ]
+    # array = []
+    # for i in [1..12]
+    #   array.push(@base.result)
     return array
 
   mapPoint: (position, x = null, y = null, f = null) =>
@@ -550,14 +663,13 @@ class @Tile
     return [x_mapped, y_mapped]
 
   calculateCenter: =>
-    result = (@bottom_left.result + @bottom_right.result + @top_left.result + @top_right.result) / 4
+    result = (@bottom_left.getResult() + @bottom_right.getResult() + @top_left.getResult() + @top_right.getResult()) / 4
     normal_sample = []
     for pos in [0..@bottom_left.normal_sample.length - 1]
       nsX1 = (@bottom_right.normal_sample[pos] - @bottom_left.normal_sample[pos]) / 2 + @bottom_left.normal_sample[pos]
       nsX2 = (@top_right.normal_sample[pos] - @top_left.normal_sample[pos]) / 2 + @top_left.normal_sample[pos]
       normal_sample.push((nsX2 - nsX1) / 2 + nsX1)
-    obj = {result: result, normal_sample: normal_sample}
-    # console.log(obj)
+    obj = new IntersectionPoint({result: result, interpolated_value: result, normal_sample: normal_sample})
     return obj
 
   getSampleAtNormalPosition: (x, y) =>
@@ -570,8 +682,16 @@ class @Tile
       value = (top - bottom) * y + bottom
       
       array.push(value)
+    array = @base.sample
     return array
 
+
+class @IntersectionPoint 
+  constructor: (options={}) ->
+    {@normal_sample, @sample, @result, @interpolated_value, @bl, @br, @tl, @tr} = options
+
+  getResult: =>
+    @interpolated_value
 
 
 
