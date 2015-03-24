@@ -54,18 +54,6 @@ class @Sampling
     _id = _x.toString() + _y.toString()
     @binlist2d[_id] = bins
 
-  getMinima: (x, y = null) =>
-    list = @binlist2d[id].bins
-    minima = []
-    for values in list
-      minima.push(Math.min.apply(null, values))
-    return minima
-
-  getMaxima: (x, y = null) =>
-    maxima = []
-    for values in @binlist2d[id].bins
-      maxima.push(Math.max.apply(null, values))
-    return maxima
 
   getBins: (x, y = null) =>
     id = @getIdString(x,y)

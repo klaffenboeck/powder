@@ -2,6 +2,27 @@
 #= require sampling
 #= require line_chart
 
+Array.merge = (array_of_arrays) ->
+  merged = []
+  merged = merged.concat.apply(merged, array_of_arrays)
+  array_of_arrays = merged
+  return array_of_arrays
+
+
+class @GlobalWebGL
+  _discrete = 0
+
+  @getDiscrete: =>
+    if _discrete
+      return 1
+    else
+      return 0
+
+  @setDiscrete: (bool = false) =>
+    _discrete = bool
+
+
+
 class @Webgl
   constructor: (options={}) ->
     {@select} = options
@@ -13,36 +34,37 @@ class @Webgl
   size = undefined
 
   # @setupGL: (gl) ->
-  @setupGL: (gl) ->
-    vertexShader = gl.createShader(gl.VERTEX_SHADER)
-    gl.shaderSource vertexShader, document.querySelector("#vertex-shader").textContent
-    gl.compileShader vertexShader
-    throw new Error(gl.getShaderInfoLog(vertexShader))  unless gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)
+  # @setupGL: (gl) ->
+  #   vertexShader = gl.createShader(gl.VERTEX_SHADER)
+  #   gl.shaderSource vertexShader, document.querySelector("#vertex-shader").textContent
+  #   gl.compileShader vertexShader
+  #   throw new Error(gl.getShaderInfoLog(vertexShader))  unless gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)
     
-    # Compile the fragment shader.
-    fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
-    gl.shaderSource fragmentShader, document.querySelector("#fragment-shader").textContent
-    gl.compileShader fragmentShader
-    throw new Error(gl.getShaderInfoLog(fragmentShader))  unless gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)
+  #   # Compile the fragment shader.
+  #   fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
+  #   gl.shaderSource fragmentShader, document.querySelector("#fragment-shader").textContent
+  #   gl.compileShader fragmentShader
+  #   throw new Error(gl.getShaderInfoLog(fragmentShader))  unless gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)
     
-    # Link and use the program.
-    program = gl.createProgram()
-    gl.attachShader program, vertexShader
-    gl.attachShader program, fragmentShader
-    gl.linkProgram program
-    throw new Error(gl.getProgramInfoLog(program))  unless gl.getProgramParameter(program, gl.LINK_STATUS)
-    gl.useProgram program
-    gl.positionBuffer = gl.createBuffer()
-    gl.positionAttribute = gl.getAttribLocation(program, "a_position")
-    gl.colorBuffer = gl.createBuffer()
-    gl.colorAttribute = gl.getAttribLocation(program, "a_color")
-    gl.sizeUniform = gl.getUniformLocation(program, "u_size")
-    gl.u_step = gl.getUniformLocation(program, "u_step")
-    gl.u_colorValues = gl.getUniformLocation(program, "u_colorValues")
-    gl.u_length = gl.getUniformLocation(program, "u_length")
-    gl.uniform1f(gl.sizeUniform, 1.0)
-    gl.program = program
-    return gl
+  #   # Link and use the program.
+  #   program = gl.createProgram()
+  #   gl.attachShader program, vertexShader
+  #   gl.attachShader program, fragmentShader
+  #   gl.linkProgram program
+  #   throw new Error(gl.getProgramInfoLog(program))  unless gl.getProgramParameter(program, gl.LINK_STATUS)
+  #   gl.useProgram program
+  #   gl.positionBuffer = gl.createBuffer()
+  #   gl.positionAttribute = gl.getAttribLocation(program, "a_position")
+  #   gl.colorBuffer = gl.createBuffer()
+  #   gl.colorAttribute = gl.getAttribLocation(program, "a_color")
+  #   gl.sizeUniform = gl.getUniformLocation(program, "u_size")
+  #   gl.u_step = gl.getUniformLocation(program, "u_step")
+  #   gl.u_colorValues = gl.getUniformLocation(program, "u_colorValues")
+  #   gl.u_length = gl.getUniformLocation(program, "u_length")
+  #   gl_u_discrete = gl.getUniformLocation(program, "u_discrete")
+  #   gl.uniform1f(gl.sizeUniform, 1.0)
+  #   gl.program = program
+  #   return gl
 
   @setupGL: (gl) ->
     vertexShader = gl.createShader(gl.VERTEX_SHADER)
@@ -71,6 +93,8 @@ class @Webgl
     gl.u_step = gl.getUniformLocation(program, "u_step")
     gl.u_colorValues = gl.getUniformLocation(program, "u_colorValues")
     gl.u_length = gl.getUniformLocation(program, "u_length")
+
+    console.log("SETUP DISCRETE CALLED")
     gl.uniform1f(gl.sizeUniform, 1.0)
     return gl
 
@@ -146,7 +170,9 @@ class @SetupWebGL
     gl.u_step = gl.getUniformLocation(program, "u_step")
     gl.u_colorValues = gl.getUniformLocation(program, "u_colorValues")
     gl.u_length = gl.getUniformLocation(program, "u_length")
+    gl.u_discrete = gl.getUniformLocation(program, "u_discrete")
     gl.uniform1f(gl.sizeUniform, 1.0)
+    console.log("SETUP WEBGL CALLED")
     gl.program = program
     return gl
 
@@ -183,16 +209,11 @@ class @WebglLegend2
     @gl.enableVertexAttribArray @gl.positionAttribute
     @gl.vertexAttribPointer @gl.positionAttribute, 2, @gl.FLOAT, false, 0, 0
 
-    # @gl.uniform1fv(@u_step, new Float32Array([0.25, 0.50, 0.75, 1.0]))
-    # @gl.uniform4fv(@u_colorValues, new Float32Array([
-    #   1.0, 0.0, 0.0, 1.0,
-    #   0.0, 1.0, 0.0, 1.0,
-    #   0.0, 0.0, 1.0, 1.0,
-    #   1.0, 1.0, 1.0, 1.0
-    # ]))
 
     @gl.uniform1fv(@gl.u_step, @slider.getCompleteValueArray())
     @gl.uniform4fv(@gl.u_colorValues, @slider.getCompleteColorArray())
+
+    @gl.uniform1i(@gl.u_discrete, GlobalWebGL.getDiscrete())
 
 
     # Define the colors (as RGBA vec4) for each vertex in the square.
@@ -235,6 +256,9 @@ class @WebglLegend2
 
 class @ProjectionView
   _current_type = undefined
+  _box_positions = []
+  _box_color_values = []
+  _added_vertices = 0
   constructor: (options = {}) ->
 
     {@sampling, @x, @y, @slider, @select, @holder, @width} = options
@@ -252,10 +276,10 @@ class @ProjectionView
     @hoverPosition()
     @addedVertices = 0
     @boxPositions = []
+    @boxColorValues = []
 
 
   redraw: =>
-    console.log("REDRAW")
     @gl.clear(@gl.COLOR_BUFFER_BIT)
     # @gl.uniform1f(@gl.sizeUniform, 3.0)
 
@@ -273,6 +297,8 @@ class @ProjectionView
 
     @gl.uniform1fv(@gl.u_step, @slider.getCompleteValueArray())
     @gl.uniform4fv(@gl.u_colorValues, @slider.getCompleteColorArray())
+
+    @gl.uniform1i(@gl.u_discrete, GlobalWebGL.getDiscrete())
 
     @gl.bindBuffer @gl.ARRAY_BUFFER, @gl.colorBuffer
     @gl.bufferData @gl.ARRAY_BUFFER, new Float32Array(
@@ -302,7 +328,7 @@ class @ProjectionView
       # -0.5, 0.5,
       # -0.5, -0.5
       #]
-      @boxPositions      
+      @getBoxPositions()      
     ), @gl.STATIC_DRAW
 
     # Bind the position buffer to the position attribute.
@@ -315,7 +341,7 @@ class @ProjectionView
 
     @gl.bindBuffer @gl.ARRAY_BUFFER, @gl.colorBuffer
     @gl.bufferData @gl.ARRAY_BUFFER, new Float32Array(
-      [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+      @getBoxColorValues()
     ), @gl.STATIC_DRAW
 
     # Bind the color buffer to the color attribute.
@@ -324,9 +350,42 @@ class @ProjectionView
     @gl.vertexAttribPointer @gl.colorAttribute, 1, @gl.FLOAT, false, 0, 0
 
     # Draw the square!
-    console.log(@addedVertices)
-    @gl.drawArrays @gl.LINES, 0, @addedVertices
+    @gl.drawArrays @gl.LINES, 0, @getAddedVertices() #@addedVertices
     
+
+  setBoxHighlighting: (positions, divider = 2) =>
+    flat = Array.merge(positions)
+    amount = flat.length / divider
+    @setBoxPositions(flat)
+    @setBoxColorValues(amount)
+    @setAddedVertices(amount)
+
+  resetBoxHighlighting: =>
+    @setBoxPositions([])
+    @setBoxColorValues(0)
+    @setAddedVertices(0)
+
+
+  setBoxPositions: (positions) =>
+    _box_positions = positions
+
+  getBoxPositions: =>
+    return _box_positions
+
+  setBoxColorValues: (amount, val = 0) =>
+    arr = []
+    for i in [1..amount]
+      arr.push(val)
+    _box_color_values = arr
+
+  getBoxColorValues: =>
+    return _box_color_values
+
+  setAddedVertices: (amount) =>
+    _added_vertices = amount
+
+  getAddedVertices: =>
+    return _added_vertices
 
   setX: (x) =>
     @x = x unless x == null
@@ -350,7 +409,6 @@ class @ProjectionView
     @redraw()
 
 
-
   getMinima: (x = null, y = null) =>
     @setX(x) if x != null
     @setY(y) if y != null
@@ -358,7 +416,35 @@ class @ProjectionView
     @setToMin()
     @currentValues = @sampling.getBins(@x, @y).getMinima()
     @generateTiles()
-    @redraw()
+    @redraw() 
+
+  getQOIs: =>
+    projection = undefined
+    bins = @sampling.getBins(@x, @y)
+    if _current_type == "min"
+      projection = bins.getMinima()
+    else
+      projection = bins.getMaxima()
+    points = @convertToProjectionPoints(projection)
+    @slider.getAllValues()
+    @qoi_list = QOI_List.factory(@slider.getAllValues(), @number_of_bins)
+    for point in points
+      @qoi_list.insert(point)
+    @qoi_list
+
+
+  convertToProjectionPoints: (obj) =>
+    list = []
+    for index, i in obj.indices
+      point = new ProjectionPoint
+        bin_index: index
+        projection_index: i
+        sample: obj.samples[i]
+        normal_sample: obj.normal_samples[i]
+        result: obj.results[i]
+      list.push(point)
+    return list
+
 
   generateTiles: =>
     @tile_list = []
@@ -542,6 +628,15 @@ class @ProjectionView
     return @max_weight_factor - Math.sqrt(Math.pow(array[0], 2) + Math.pow(array[1], 2)) if array
     return 0
 
+  getTiles: (array = []) =>
+    tiles = []
+    for tile_id in array
+      tiles.push(@getTile(tile_id))
+    return tiles
+
+  getTile: (pos) =>
+    return @tile_list[pos]
+
   drawAxis: (x, y) =>
     @drawAxisX(x)
     @drawAxisY(y)
@@ -562,7 +657,7 @@ class @ProjectionView
     y = undefined
     $(@select + " .complex-slide").mousemove( (e) ->
       window.m.navigation.show_preview_lines()
-      that.addedVertices = 8
+      #that.addedVertices = 8
       posX = $(@).offset().left
       posY = $(@).offset().top
       x = e.pageX - posX + 0.5
@@ -570,11 +665,13 @@ class @ProjectionView
       y = @width - y
       t = that.getSampleValue(x, y)
       window.m.navigation.estimate_preview(t[0])
-      that.boxPositions = t[1]
+
+      that.setBoxHighlighting(t[1])
       that.redraw()
     ).mouseleave( (e) ->
       window.m.navigation.hide_preview_lines()
-      that.addedVertices = 0
+      #that.setAddedVertices(0)
+      that.resetBoxHighlighting()
       that.redraw()
     ).mousedown( (e) ->
       vals = that.getSampleValue(x, y)
@@ -600,7 +697,6 @@ class @ProjectionView
   hoverBounds: (val) =>
 
 
-   
 
 
 class @Tile
@@ -686,12 +782,399 @@ class @Tile
     return array
 
 
-class @IntersectionPoint 
+
+class @SamplePoint 
   constructor: (options={}) ->
-    {@normal_sample, @sample, @result, @interpolated_value, @bl, @br, @tl, @tr} = options
+    {@normal_sample, @sample, @result} = options
+
+class @IntersectionPoint extends SamplePoint
+  constructor: (options={}) ->
+    super(options)
+    {@interpolated_value, @bl, @br, @tl, @tr} = options
 
   getResult: =>
     @interpolated_value
+
+class @ProjectionPoint extends SamplePoint
+  constructor: (options={}) ->
+    super(options)
+    @bin_index = options.bin_index
+    @projection_index = options.projection_index
+
+  nextX: =>
+    @projection_index + 1
+
+  nextY: (offset) =>
+    @projection_index + offset
+
+
+
+
+class @QOI_List
+  constructor: (options={}) ->
+    @qois = options.qois ? []
+    @bounds = options.bounds ? []
+    @number_of_bins = options.number_of_bins
+
+
+  @factory: (bins, number_of_bins) ->
+    qois = []
+    for bin, i in bins
+      low = 0
+      unless i == 0
+        low = bins[i-1]
+      high = bin
+      qois.push(new QOI({low: low, high: high, offsetY: @number_of_bins}))
+    return new QOI_List({qois: qois, bounds: bins, number_of_bins: number_of_bins})
+
+  insert: (point) =>
+    for qoi in @qois
+      if qoi.rangeCheck(point)
+        qoi.add(point)
+        break
+
+
+class @QOI
+  _temp_array = []
+  _starting_points = []
+  _counter = 0
+  constructor: (options) ->
+    {@low, @high, @offsetY} = options
+    @values = []
+    @clusters = []
+
+  add: (value) =>
+    @values.push(value)
+
+  rangeCheck: (point) =>
+    value = if point.constructor == Number then point else point.result
+    if value >= @low and value <= @high
+      return true
+    else
+      return false
+
+  cluster: (number_of_lines = 20) =>
+    scan = ClusterScan.factory(@values, number_of_lines)
+    @clusters = scan.getClusters()
+    #return clusters
+
+  getRange: (type = "Array") =>
+    return [@low, @high] if type == "Array" or type == "array"
+    string = @low + " - " + @high
+    return string if type == "String" or type == "string"
+    return "<p>" + string + "</p>" if type == "html" or type == "Html" or type == "HTML"
+
+
+  toHtml: (options = {}) =>
+    range = "Range:" + HH.br()
+    range += " - H: " + @high + HH.br() + " - L: " + @low
+    string1 = "Top projections: " + @values.length
+    string2 = "Visual clusters: " + @clusters.length
+    html = new HtmlHelper()
+    string = string1 + HH.br() + string2
+    html.addP(range)
+    html.addP(string)
+    #html.addP(string2)
+    rows = []
+    for cluster, i in @clusters 
+      rows.push(cluster.toRow({number: i + 1}))
+    table = HH.table({rows: rows})
+    html.add(table)
+    html.print()
+
+
+
+
+
+class @HtmlHelper
+  constructor: (options = {}) ->
+    @html = options.html ? ""
+
+  @p: (input) ->
+    return "<p>" + input + "</p>"
+
+  @td: (input) ->
+    return "<td>" + input + "</td>"
+
+  @tr: (tds = [], id = "") ->
+    tr = "<tr>"
+    tr = "<tr id='" + id + "'>" if id.length
+    for td in tds
+      tr += td
+    tr += "</tr>" 
+
+  @br: ->
+    return "<br />"
+
+  @table: (options = {}) ->
+    table = "<table class='table table-hover'>"
+    header = options.header ? undefined
+    table += header if header
+    for row in options.rows
+      table += row
+    table += "</table>"
+    return table
+
+  add: (input) =>
+    @html += input
+
+  addBr: =>
+    @add(HH.br())
+
+  addP: (input) =>
+    @add(HH.p(input))
+
+  print: =>
+    return @html
+
+@HH = HtmlHelper
+
+
+
+class @ClusterScan
+  _start_segments = undefined
+  constructor: (options={}) ->
+    @scanlines = options.scanlines ? []
+    _temp_segments = []
+
+  @factory: (values, number_of_lines) ->
+    nol = number_of_lines
+    lines = []
+    for line in [1..nol]
+      lines.push([])
+    for val in values
+      value = val.projection_index
+      pos = Math.floor(value / nol)
+      lines[pos].push(value)
+    scanlines = []
+    for line in lines 
+      scanline = ScanLine.factory(line)
+      scanlines.push(scanline)   
+    clusterscan = new ClusterScan
+      scanlines: scanlines
+    return clusterscan
+
+  lastLine: =>
+    @scanlines[@scanlines.length - 1]
+
+  connectSegments: =>
+    for line, i in @scanlines
+      unless line == @lastLine()
+        line.connectSegments(@scanlines[i + 1])
+    return true
+
+  getAllSegments: =>
+    segments = []
+    for line in @scanlines
+      segments.push(line.getSegments())
+    merged = []
+    merged = merged.concat.apply(merged, segments)
+    return merged
+
+  getClusters: =>
+    @connectSegments()
+    _start_segments = @getAllSegments()
+    clusters = []
+    while _start_segments.length
+      segment = _start_segments.splice(0,1)[0]
+      cluster = @buildGraph(segment)
+      clusters.push(cluster) unless cluster.isEmpty()
+
+    return clusters
+
+
+  buildGraph: (segment) =>
+    #console.log(segment)
+    segments = []
+    nexts = []
+    segments.push(segment)
+    @_removeFromStart(segment)
+    for seg in segment.getConnections()
+      nexts.push(seg)
+      segments.push(seg)
+      @_removeFromStart(seg)
+    while nexts.length
+      next = nexts.splice(0,1)[0]
+      @_removeFromStart(next)
+      for seg in next.getConnections()
+        @_removeFromStart(seg) 
+        if segments.indexOf(seg) < 0
+          nexts.push(seg)
+          segments.push(seg)
+
+    return new Cluster({graph: segments})
+
+  _removeFromStart: (segment) =>
+    index = _start_segments.indexOf(segment)
+    if index >= 0
+      _start_segments.splice(index,1)
+      return true
+    return false
+
+
+
+
+class @ScanLine
+  constructor: (options={}) ->
+    @line_segments = options.line_segments ? []
+    @original_array = options.original_array
+
+
+  @factory: (array) ->
+    segments = []
+    segment = new LineSegment
+    segments.push(segment)
+    for val in array
+      unless segment.add(val)
+        segment = new LineSegment
+        segments.push(segment)
+        segment.add(val)
+    scanline = new ScanLine
+      line_segments: segments
+      original_array: array
+    return scanline
+
+  connectSegments: (scanline) =>
+    for segment_1 in @line_segments
+      for segment_2 in scanline.line_segments
+        segment_1.tryToConnect(segment_2)
+
+  getSegments: =>
+    @line_segments
+
+
+
+class @LineSegment
+  constructor: (options={}) ->
+    @elements = []
+    @elements.push(options.first) if options.first
+    @connections = []
+
+  add: (element) =>
+    if !@elements.length or @elements[@elements.length - 1] + 1 == element
+      @elements.push(element)
+      return true
+    else
+      return false
+
+  tryToConnect: (segment, offsetY = 20) =>
+    if @topConnectedTo(segment, offsetY)
+      @connections.push(segment)
+      segment.connections.push(@)
+
+  topConnectedTo: (segment, offsetY = 20) =>
+    for element in @elements
+      if segment.elements.indexOf(element + offsetY) >= 0
+        return true
+    first = @elements[0]
+    unless first % offsetY == 0
+      if segment.elements.indexOf(first + offsetY - 1) >= 0
+        return true
+    last = @elements[@elements.length - 1] 
+    unless last % offsetY == @elements.length - 1
+      if segment.elements.indexOf(last + offsetY + 1) >= 0
+        return true
+    if @elements.length == 1
+      console.log("topConnectedTo?")
+      console.log(@)
+      console.log(segment)
+    return false
+
+  getConnections: =>
+    @connections
+
+  getElements: =>
+    @elements
+
+
+
+class @Cluster
+  _hover_id = undefined
+  constructor: (options = {}) ->
+    @array = []
+    @false_array = []
+    @graph = options.graph
+    @tiles = []
+    @_hover_id
+
+  addAdjacent: (value) =>
+    if @array.length
+      if(@array.indexOf(value - 1) >= 0 or @array.indexOf(value - 20) >= 0)
+        @array.push(value)
+        return true
+      else
+        @false_array.push(value)
+        return false
+    else
+      @array.push(value)
+      return true
+
+  size: =>
+    @array.length
+
+  getValues: =>
+    @array
+
+  getIndices: =>
+    collected = []
+    for segment in @graph
+      collected.push(segment.getElements())
+    merged = []
+    merged = merged.concat.apply(merged, collected)
+    merged.sort( (a, b) ->
+      return a - b 
+    )
+    return merged
+
+  numberOfTiles: =>
+    @array.length
+
+  setHoverId: (id) =>
+    @_hover_id = "cluster-" + id
+
+  getHoverId: =>
+    return @_hover_id
+
+  resetHoverId: =>
+    @_hover_id = undefined
+
+  isEmpty: =>
+    return true if @getIndices().length == 0
+    return false
+
+  toRow: (options = {}) =>
+    number = options.number
+    tds = []
+    string = "Cluster-" + number
+    tds.push(HH.td(string))
+    tds.push(HH.td(@tiles.length))
+    tds.push(HH.td("load"))
+    HH.tr(tds, "cluster-" + number)
+
+
+  checkAdjacence: (cluster) =>
+    if @size() > cluster.size()
+      for value in cluster.getValues()
+        if @getValues().indexOf(value - 1) >= 0 or @getValues().indexOf(value - 20) >= 0 or @getValues().indexOf(value + 1) >= 0 or @getValues().indexOf(value + 20) >= 0
+          return true
+      return false
+    else
+      for value in @getValues()
+        if cluster.getValues().indexOf(value - 1) >= 0 or cluster.getValues().indexOf(value - 20) >= 0 or cluster.getValues().indexOf(value + 1) >= 0 or cluster.getValues().indexOf(value + 20) >= 0
+          return true
+      return false
+
+  getTiles: =>
+    return @tiles
+
+  setTiles: (tiles) =>
+    @tiles = tiles
+
+  getTileBounds: =>
+    array = []
+    for tile in @tiles
+      array.push(tile.getBoundingPositions())
+    Array.merge(array)
 
 
 

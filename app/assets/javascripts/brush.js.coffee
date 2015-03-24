@@ -172,10 +172,9 @@ class @Slider
     _new_handle = false
 
 
-
-
 class @Handle
   _last_click = 0
+  @qoi = undefined
   constructor: (options={}) ->
     {@slider, @domain, @overlay} = options
     _slider = @slider
@@ -198,11 +197,10 @@ class @Handle
         _start = @getPosition()
         # @slider.noNewHandle()
         $(".picker").spectrum("hide")
+        $("#batch-panel").dialog("close")
       )
       .on("brush", =>
         @reposition(d3.mouse(@overlay)[1] + _offset) 
-        #console.log(d3.mouse(@overlay))
-        # @slider.noNewHandle()
         @slider.resort()
         @slider.redrawSubscribers()
       )
@@ -212,8 +210,34 @@ class @Handle
           @slider.removeHandle(@)
           return
         d3.event.sourceEvent.preventDefault()
+        window.m.complex_view_holder.prepareQOIs()
         if _start == @getPosition() 
-          $(@picker).spectrum("show")
+          #console.log(@handle)
+          #$(@picker).spectrum("show")
+          #$(@picker2).spectrum()
+          @getSpectrum()
+          @qoi.cluster()
+          window.m.complex_view_holder.getTiles()
+          for cluster, i in @qoi.clusters
+            window.m.complex_view_holder.setTilesForCluster(cluster)
+            cluster.setHoverId(i + 1)
+            console.log(cluster.getHoverId())
+            
+          $("#visual-clusters").html(@qoi.toHtml())
+
+          # not cleanly implemented, but for now its working (two loops needed, see before)
+          for cluster, i in @qoi.clusters
+            console.log("cluster" + i)
+            window.m.complex_view_holder.setHoverForCluster(cluster)
+          $("#batch-panel").dialog(
+            closeOnEscape: true
+            title: "Quantity of interest" #"Range: " + @qoi.getRange("String")
+            position: 
+              my: "left top"
+              at: "right+20 top-16"
+              of: @handle[0]
+          )
+          $('#panel-colorpicker-wrapper').show()
         @slider.resort()
         @slider.redrawSubscribers()
         window.m.hist.render()
@@ -230,6 +254,8 @@ class @Handle
 
     # @color = new Color("black")
 
+    @picker2 = $('#panel-colorpicker')
+
     @picker = d3.select("#colorpicker")
       .append("div")
       .attr("class","picker")[0]
@@ -243,17 +269,13 @@ class @Handle
       palette: [
         ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
         ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"]
-        # ["#f4cccc","#fce5cd","#fff2cc","#d9ead3","#d0e0e3","#cfe2f3","#d9d2e9","#ead1dc"],
-        # ["#ea9999","#f9cb9c","#ffe599","#b6d7a8","#a2c4c9","#9fc5e8","#b4a7d6","#d5a6bd"],
-        # ["#e06666","#f6b26b","#ffd966","#93c47d","#76a5af","#6fa8dc","#8e7cc3","#c27ba0"],
-        # ["#c00","#e69138","#f1c232","#6aa84f","#45818e","#3d85c6","#674ea7","#a64d79"],
-        # ["#900","#b45f06","#bf9000","#38761d","#134f5c","#0b5394","#351c75","#741b47"],
-        # ["#600","#783f04","#7f6000","#274e13","#0c343d","#073763","#20124d","#4c1130"]
+
       ],
       change: (color) =>
         # @handle.attr("fill", color.toHexString())
         # @color.setColor(color.toHexString())
         # @slider.legend.redraw()
+        console.log("CHANGING")
         @changeColor(color.toHexString())
     })
 
@@ -262,6 +284,26 @@ class @Handle
 
   getPosition: =>
     @brush.extent()[1]
+
+  getSpectrum: =>
+    $(@picker2).spectrum({
+      showPaletteOnly: true,
+      togglePaletteOnly: true,
+      color: @color.color.toString(),
+      hideAfterPaletteSelect: true,
+      # clickoutFiresChange: true,
+      palette: [
+        ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
+        ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"]
+
+      ],
+      change: (color) =>
+        # @handle.attr("fill", color.toHexString())
+        # @color.setColor(color.toHexString())
+        # @slider.legend.redraw()
+        console.log("CHANGING")
+        @changeColor(color.toHexString())
+    })
 
   outOfRange: =>
 
@@ -285,7 +327,7 @@ class @Handle
 
   reposition: (pos) =>
     @brush.extent([pos, pos])
-    console.log(@brush.extent())
+    #console.log(@brush.extent())
     @handle.attr("transform", =>
       "translate(7," + pos + ")"
     )
@@ -314,4 +356,9 @@ class @Handle
     else
       _last_click = time 
       false
+  setQOI: (qoi) =>
+    @qoi = qoi
+
+  getQOI: =>
+    return @qoi
 

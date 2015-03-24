@@ -186,6 +186,8 @@ class @ComplexViewHolder
   _slide_counter = 0
   _nav_domains = undefined
   slides = []
+  _current_slide = undefined
+  _discrete = 0
   constructor: (options = {}) ->
     {@slider, @sampling} = options
     _nav_domains = options.domains
@@ -221,6 +223,14 @@ class @ComplexViewHolder
     slide.getMaxima(x, y)
     return slide
 
+  setCurrentSlide: (slide) =>
+    _current_slide = slide
+    @displayCurrentSlide()
+
+  getCurrentSlide: =>
+    return _current_slide
+
+
   getDomain: (number) =>
     return _nav_domains[number]
 
@@ -232,13 +242,16 @@ class @ComplexViewHolder
 
   addSlide: (slide) =>
     slides.push(slide)
+    @setCurrentSlide(slide)
 
   getSlides: (num = null) =>
     return slides if num == null
     @getSlide(num)
 
   getSlide: (num) =>
-    return slides[num]
+    slide = slides[num]
+    @setCurrentSlide(slide)
+    return slide
 
   getAxis: (num, orient) =>
     _domain = @getDomain(num)
@@ -252,6 +265,49 @@ class @ComplexViewHolder
       .scale(scale)
       .orient(orient)
     return axis
+
+  displayCurrentSlide: =>
+    select = @getCurrentSlide().select
+    $('.complex-view').hide()
+    $(select).show()
+
+  prepareQOIs: =>
+    slide = @getCurrentSlide()
+    qoilist = slide.getQOIs()
+    for qoi, i in qoilist.qois
+      slide.slider.handles[i].setQOI(qoi)
+    return true
+
+  getTiles: (indices) =>
+    tiles = @getCurrentSlide().getTiles(indices)
+
+  setTilesForCluster: (cluster) =>
+    indices = cluster.getIndices()
+    cluster.setTiles(@getTiles(indices))
+
+  drawClusterBounds: (cluster) =>
+    bounds = cluster.getTileBounds()
+    slide = @getCurrentSlide()
+    slide.setBoxHighlighting(bounds)
+    slide.redraw()
+
+  resetClusterBounds: =>
+    slide = @getCurrentSlide()
+    slide.resetBoxHighlighting()
+    slide.redraw()
+
+  setHoverForCluster: (cluster) =>
+    id = "#" + cluster.getHoverId()
+    that = @
+    $(id).mouseenter( (e) =>
+      that.drawClusterBounds(cluster)
+    ).mouseleave( (e) =>
+      that.resetClusterBounds()
+    )
+
+
+
+
 
 
 
