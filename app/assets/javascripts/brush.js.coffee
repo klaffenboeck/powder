@@ -11,6 +11,9 @@ class @Slider
     @boundaries = new Boundaries
       height: @legend.slider_value
       width: 50
+      margin:
+        top: 5
+        bottom: 5
 
     _new_handle = false
 
@@ -18,15 +21,25 @@ class @Slider
     @subscribe(@legend)
 
     @domain = options.domain ? @defaultDomain()
+    # @legend_domain = @legendDomain()
 
     @axis = new Axis
       domain: @domain
       #orientation: "right"
       ticks: 0
 
+    @scale = new Axis
+      domain: @domain
+      orientation: "left"
+
     @svg = d3.select(@select).append("svg")
       .attr("width", @boundaries.width)
-      .attr("height", @boundaries.height)
+      .attr("height", @boundaries.height + 14)
+      .attr(
+        "transform",
+        "translate(0,7)"
+      )
+
 
     @colorpicker = d3.select(@select).append("div")
       .attr("id", "colorpicker")
@@ -36,8 +49,27 @@ class @Slider
       .attr("class","slider")
       .attr("width", @boundaries.width)
 
+
     @slideraxis = @slider.call(@axis.axis)
-    @slideraxis.attr("transform", "translate(2,0)")
+    @slideraxis.attr("transform", "translate(0,0)")
+
+
+
+    @svg_scale = d3.select("#legend-scale").append("svg")
+      .attr("width", 30)
+      .attr("height", @boundaries.height + 14)
+      .attr("transform", "translate(0, 7)")
+
+    @sliderleft = @svg_scale.append("g")
+      .attr("class", "sliderscale")
+      .attr("width", @boundaries.width)
+
+    @sliderscale = @sliderleft.call(@scale.axis)
+    @sliderscale.attr("transform", "translate(30, 0)")
+
+
+
+
 
     @slider.on("mousedown", =>
       @newHandle()
@@ -60,26 +92,54 @@ class @Slider
       height: @legend.slider_value
       # height: 20
 
-  redrawSubscribers: =>
+  # legendDomain: =>
+  #   new Domain
+  #     name: "legend-domain"
+  #     range: [0.95, 1]
+  #     height: @legend.slider_value
+  #     scaletype: "linear"
+
+
+  changeDomain: (vals) =>
+    @domain.domain.domain(vals)
+    @slider.call(@axis.axis)
+    @sliderleft.call(@scale.axis)   
+    window.m.selection_manager.smd.changeDomain(vals)
+    window.m.selection_manager.current_smd.changeDomain(vals)
+    @redrawSubscribers(vals)
+
+
+  redrawSubscribers: (bounds = undefined) =>
     for subscriber in @subscribers
-      subscriber.redraw()
+      subscriber.redraw(bounds)
 
 
   subscribe: (subscriber) =>
     @subscribers.push(subscriber)
 
   addHandle: (options={}) =>
-    _color = undefined # options.color ? new Color("black")
+
+    position = options.position if _.isNumber(options.position)
+    position = @domain.domain(options.value) if _.isNumber(options.value)
     _autocolor = options.autocolor ? false
     if _autocolor
-      pos = @legend.slider_value - options.position
-      _color = @getColorAt(pos / @legend.slider_value).toString()
+      pos = @legend.slider_value - position
+      # stepwidth = upperVal - lowerVal
+      # currentStep = (value - lowerVal) / stepwidth
+      # rWidth = upperColor.r - lowerColor.r
+      # r = lowerColor.r + currentStep * rWidth
+      d = @domain.domain.domain()
+      domainwidth = d[1] - d[0]
+      stepwidth = domainwidth / @legend.slider_value
+      inner_value = stepwidth * pos
+      value = d[0] + inner_value
+      _color = @getColorAt(value).toString()
     else 
       _color = options.color ? new Color("black")
     _handle = new Handle
       slider: @
       color: _color
-    _handle.reposition(options.position) if options.position
+    _handle.reposition(position) if position
     # _handle.changeColor(@getColorAt(_handle.value())) if _autocolor
     _handle.setDirection("left")
     @handles.push(_handle)
@@ -134,6 +194,7 @@ class @Slider
 
 
   getColorAt: (value) =>
+    console.log(value)
     lowerVal = 0
     upperVal = 1
     colors = @getAllColors()
@@ -175,6 +236,8 @@ class @Slider
 class @Handle
   _last_click = 0
   @qoi = undefined
+  _first_brush = false
+  _initialized_dialog = false
   constructor: (options={}) ->
     {@slider, @domain, @overlay} = options
     _slider = @slider
@@ -196,8 +259,8 @@ class @Handle
         _offset = @getPosition() - d3.mouse(@overlay)[1]
         _start = @getPosition()
         # @slider.noNewHandle()
-        $(".picker").spectrum("hide")
-        $("#batch-panel").dialog("close")
+        $(".picker").spectrum("hide") if _initialized_dialog
+        $("#batch-panel").dialog("close") if _initialized_dialog
       )
       .on("brush", =>
         @reposition(d3.mouse(@overlay)[1] + _offset) 
@@ -206,6 +269,7 @@ class @Handle
       )
       .on("brushend", =>
         # marker didn't get moved, only clicked
+        _first_brush = true
         if @doubleClick(Date.now()) or @outOfRange()
           @slider.removeHandle(@)
           return
@@ -215,23 +279,27 @@ class @Handle
           #console.log(@handle)
           #$(@picker).spectrum("show")
           #$(@picker2).spectrum()
+          _initialized_dialog = true
           @getSpectrum()
           @qoi.cluster()
           window.m.complex_view_holder.getTiles()
           for cluster, i in @qoi.clusters
             window.m.complex_view_holder.setTilesForCluster(cluster)
             cluster.setHoverId(i + 1)
-            console.log(cluster.getHoverId())
+            # console.log(cluster.getHoverId())
             
           $("#visual-clusters").html(@qoi.toHtml())
 
           # not cleanly implemented, but for now its working (two loops needed, see before)
+          window.m.selection_manager.resetClusters()
           for cluster, i in @qoi.clusters
-            console.log("cluster" + i)
+            # console.log("cluster" + i)
             window.m.complex_view_holder.setHoverForCluster(cluster)
+            window.m.selection_manager.addCluster(cluster)
+          window.m.selection_manager.setupClusterListener()
           $("#batch-panel").dialog(
             closeOnEscape: true
-            title: "Quantity of interest" #"Range: " + @qoi.getRange("String")
+            title: "Regions of interest" #"Range: " + @qoi.getRange("String")
             position: 
               my: "left top"
               at: "right+20 top-16"
@@ -240,7 +308,8 @@ class @Handle
           $('#panel-colorpicker-wrapper').show()
         @slider.resort()
         @slider.redrawSubscribers()
-        window.m.hist.render()
+        window.m.selection_manager.updateColorsInRunList();
+        #window.m.hist.render()
       )
 
     @handle = _slider.append("polygon")
@@ -265,17 +334,19 @@ class @Handle
       togglePaletteOnly: true,
       color: @color.color.toString(),
       hideAfterPaletteSelect: true,
+
       # clickoutFiresChange: true,
       palette: [
         ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
-        ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"]
+        ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
+        ['rgb(118,42,131)','rgb(175,141,195)','rgb(231,212,232)','rgb(247,247,247)','rgb(217,240,211)','rgb(127,191,123)','rgb(27,120,55)']
 
       ],
       change: (color) =>
         # @handle.attr("fill", color.toHexString())
         # @color.setColor(color.toHexString())
         # @slider.legend.redraw()
-        console.log("CHANGING")
+        #console.log("CHANGING")
         @changeColor(color.toHexString())
     })
 
@@ -291,17 +362,30 @@ class @Handle
       togglePaletteOnly: true,
       color: @color.color.toString(),
       hideAfterPaletteSelect: true,
-      # clickoutFiresChange: true,
+      showInput: true,
+      preferredFormat: "hex",
+      clickoutFiresChange: true,
       palette: [
-        ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
-        ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"]
+        #["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
+        #["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
+        #['rgb(118,42,131)','rgb(175,141,195)','rgb(231,212,232)','rgb(247,247,247)','rgb(217,240,211)','rgb(127,191,123)','rgb(27,120,55)']
+        ['rgb(178,24,43)','rgb(239,138,98)','rgb(253,219,199)','rgb(247,247,247)','rgb(209,229,240)','rgb(103,169,207)','rgb(33,102,172)'],
+        ['rgb(254,229,217)','rgb(252,187,161)','rgb(252,146,114)','rgb(251,106,74)','rgb(239,59,44)','rgb(203,24,29)','rgb(153,0,13)'],
+        #['rgb(254,237,222)','rgb(253,208,162)','rgb(253,174,107)','rgb(253,141,60)','rgb(241,105,19)','rgb(217,72,1)','rgb(140,45,4)'],
+        ['rgb(239,243,255)','rgb(198,219,239)','rgb(158,202,225)','rgb(107,174,214)','rgb(66,146,198)','rgb(33,113,181)','rgb(8,69,148)'],
+        ['rgb(237,248,233)','rgb(199,233,192)','rgb(161,217,155)','rgb(116,196,118)','rgb(65,171,93)','rgb(35,139,69)','rgb(0,90,50)'],
+        ['rgb(247,247,247)','rgb(217,217,217)','rgb(189,189,189)','rgb(150,150,150)','rgb(115,115,115)','rgb(82,82,82)','rgb(37,37,37)']
 
       ],
-      change: (color) =>
+      move: (color) =>
         # @handle.attr("fill", color.toHexString())
         # @color.setColor(color.toHexString())
         # @slider.legend.redraw()
-        console.log("CHANGING")
+        #console.log("CHANGING")
+        @changeColor(color.toHexString())
+      hide: (color) =>
+
+        #console.log("CHANGING")
         @changeColor(color.toHexString())
     })
 
@@ -316,7 +400,8 @@ class @Handle
     @handle.attr("fill", color)
     @color.setColor(color)
     @slider.redrawSubscribers()
-    window.m.hist.render()
+    window.m.selection_manager.updateColorsInRunList()
+    #window.m.hist.render()
 
   setDirection: (direction) =>
     switch direction

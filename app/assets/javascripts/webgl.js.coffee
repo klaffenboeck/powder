@@ -98,7 +98,7 @@ class @Webgl
     gl.uniform1f(gl.sizeUniform, 1.0)
     return gl
 
-  redraw: =>
+  redraw: (bounds = undefined) =>
     @gl.clear(@gl.COLOR_BUFFER_BIT)
     @gl.uniform1f(@gl.sizeUniform, 3.0)
 
@@ -186,9 +186,14 @@ class @WebglLegend2
     @gl = SetupWebGL.setupGL(@gl)
     @redraw()
     @clickPosition()
+    @_bottom = 0
+    @_top = 1
 
 
-  redraw: =>
+  redraw: (bounds = undefined) =>
+    unless _.isUndefined(bounds)
+      @_bottom = bounds[0]
+      @_top = bounds[1]
     @gl.clear(@gl.COLOR_BUFFER_BIT)
     # @gl.uniform1f(@gl.sizeUniform, 3.0)
 
@@ -219,10 +224,10 @@ class @WebglLegend2
     # Define the colors (as RGBA vec4) for each vertex in the square.
     @gl.bindBuffer @gl.ARRAY_BUFFER, @gl.colorBuffer
     @gl.bufferData @gl.ARRAY_BUFFER, new Float32Array([
-      0.0
-      1.0
-      1.0
-      0.0
+      @_bottom
+      @_top
+      @_top
+      @_bottom
 
     ]), @gl.STATIC_DRAW
 
@@ -867,9 +872,11 @@ class @QOI
 
   toHtml: (options = {}) =>
     range = "Range:" + HH.br()
-    range += " - H: " + @high + HH.br() + " - L: " + @low
+    high = Math.roundFloat(@high, 4)
+    low = Math.roundFloat(@low, 4)
+    range += " - H: " + high + HH.br() + " - L: " + low
     string1 = "Top projections: " + @values.length
-    string2 = "Visual clusters: " + @clusters.length
+    string2 = "Coherent regions: " + @clusters.length
     html = new HtmlHelper()
     string = string1 + HH.br() + string2
     html.addP(range)
@@ -896,6 +903,7 @@ class @HtmlHelper
   @td: (input) ->
     return "<td>" + input + "</td>"
 
+
   @tr: (tds = [], id = "") ->
     tr = "<tr>"
     tr = "<tr id='" + id + "'>" if id.length
@@ -903,8 +911,22 @@ class @HtmlHelper
       tr += td
     tr += "</tr>" 
 
+  @data: (data, content = undefined) =>
+    content = "'" + content + "'" if _.isString(content)
+    string = "data-" + data
+    string += "=" + content unless _.isUndefined(content)
+    return string
+
+
   @br: ->
     return "<br />"
+
+  @div: (options = {}) =>
+    id = if options.id then " id='" + options.id + "'" else ""
+    _klass = if options.class then " class='" + options.class + "'" else ""
+    _data = if options.data then " " + options.data else ""
+    content = options.content ? ""
+    div = "<div" + id + _klass + _data + ">" + content + "</div>"
 
   @table: (options = {}) ->
     table = "<table class='table table-hover'>"
@@ -915,6 +937,15 @@ class @HtmlHelper
     table += "</table>"
     return table
 
+  @option: (content, value) =>
+    return "<option class='option option-" + value + "' value='" + value + "'>" + content + "</option>"
+
+  @cogSpin: =>
+    "<i class='fa fa-cog fa-spin'></i>"
+
+  @pulseSpin: =>
+    "<i class='fa fa-spinner fa-pulse'></i>"
+
   add: (input) =>
     @html += input
 
@@ -924,8 +955,17 @@ class @HtmlHelper
   addP: (input) =>
     @add(HH.p(input))
 
+  addDiv: (options = {}) =>
+    @add(HH.div(options))
+
+  addOption: (content, value) =>
+    @add(HH.option(content, value))
+
+
   print: =>
     return @html
+
+  #addSegment: ()
 
 @HH = HtmlHelper
 
@@ -1145,10 +1185,15 @@ class @Cluster
   toRow: (options = {}) =>
     number = options.number
     tds = []
-    string = "Cluster-" + number
+    string = "Region-" + number
     tds.push(HH.td(string))
     tds.push(HH.td(@tiles.length))
-    tds.push(HH.td("load"))
+    button = HH.div
+      id: "cluster-" + number
+      data: HH.data("load-cluster", number - 1)
+      class: "cluster region region-" + number
+      content: "load"
+    tds.push(HH.td(button))
     HH.tr(tds, "cluster-" + number)
 
 

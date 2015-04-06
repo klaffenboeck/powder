@@ -23,6 +23,7 @@ class Project::ParameterSpace < ActiveRecord::Base
   end
   
   def generate_sample_points(rows, save_raw_data = false)
+    p "GENERATE SAMPLE POINTS"
     raw_data = Estimation::RawData.factory(rows: rows, cols: size)
     #raw_data.save if save_raw_data
     map_normals(raw_data)

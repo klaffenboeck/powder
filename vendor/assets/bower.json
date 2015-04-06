@@ -2,9 +2,11 @@
   "name": "dsl-generated dependencies",
   "dependencies": {
     "bootstrap": "latest",
+    "fontawesome": "latest",
     "d3": "latest",
     "numbers.js": "latest",
     "knockout": "latest",
-    "spectrum": "latest"
+    "spectrum": "latest",
+    "underscore": "latest"
   }
 }

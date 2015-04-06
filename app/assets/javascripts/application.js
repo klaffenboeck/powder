@@ -19,4 +19,5 @@
 //= require knockout/dist/knockout
 //= require numbers.js/src/numbers.min
 //= require spectrum/spectrum
+//= require underscore/underscore-min
 //= require_tree .

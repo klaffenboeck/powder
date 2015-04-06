@@ -63,10 +63,28 @@ void main(void) {
 }
 
 </script>
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="/">POWDER</a>
 
-<div id="headline">
-<h1>Powder workspace</h1>
-</div>
+        <div id="min-quality" class="input-group input-group-sm quality-changer">
+          <span class="input-group-addon" id="min-value-addon">min</span>
+          <span><input type="number" name="min-value" id="min-value" class="form-control input-group" value="0.00" min="0.00" max="0.99" step="0.01" pattern="\d\.\d\d" /></span>
+        </div>
+        <div id="max-quality" class="input-group input-group-sm quality-changer">
+          <input type="number" name="max-value" id="max-value" class="form-control" value="1.00" min="0.01" max="1.00" step="0.01" pattern="\d\.\d\d" /></span>
+          <span class="input-group-addon" id="max-value-addon">max</span>
+        </div>
+      <div id="projection-style" class="input-group input-group-sm">
+      <span class="glyphicon glyphicon-eye-open input-group-addon" id="eye-addon"></span> <select id="projection-style-select" class="form-control" aria-describedby="eye-addon">
+         <option id="continous-projection"  value="0" selected="selected" >continouos</option>
+         <option id="discrete-projection" value="1">discrete</option>
+      </select>
+    </div>
+    </div>
+  </div>
+</nav>
 
 <% @project_setting.name %>
 
@@ -75,13 +93,34 @@ void main(void) {
 <div id="content-wrapper">
   <%= render "detail_view" %>
   <div id="navigation"></div>
-  <div id="comparison"></div>
+  <div id="smd">
+    <div id="current">
+      <div id="current-progress-switch">No current run selected</div>
+    </div>
+    <div id="order-bar"></div>
+    <div id="runlist"></div>
 
+  </div>
+
+  <div id="projection-control"> 
+
+    <div id="projection-y">
+      <select id="projection-y-select" class="axis-selector" name="projection-y"></select><span class="glyphicon glyphicon-arrow-up">
+      
+    </div>
+    <div id="projection-x">
+      <select id="projection-x-select" class="axis-selector" name="projection-x"></select><span class="glyphicon glyphicon-arrow-right">
+    </div>
+
+
+
+  </div>
   <div id="webgl-area" style="position: absolute; top: 80px; left: 720px">
     <!--<canvas id="projection-view" width="200" height="200"></canvas>-->
     <div style="clear: both"></div>
     <div id="legend-brush-group">
-      <canvas id="gl_legend" width="40" height="400" data-slider-max="400"></canvas>
+      <div id="legend-scale"></div>
+      <canvas id="gl_legend" width="40" height="350" data-slider-max="350"></canvas>
       <div id="brush"></div>
     </div>
   </div>

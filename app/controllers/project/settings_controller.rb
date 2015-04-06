@@ -39,6 +39,8 @@ class Project::SettingsController < ApplicationController
   def alternative_estfunc
     #parameters = project_setting_params
     result_vector = params[:parameters]
+    p "RESULT VECTOR"
+    p result_vector
     rv = result_vector.map do |r|
       r = r.to_f
     end

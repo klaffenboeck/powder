@@ -42,8 +42,12 @@ intAreaTableInvSymm::usage = "No description yet";
 powderXRDfunctionInvSymm::usage = "TBA";
 fourParameterFunction::usage = "TBA";
 nineParameterFunction::usage = "TBA";
+tenParameterFunction::usage = "TBA";
+twelveParameterFunction::usage = "TBA";
 SampleFourParamFunction::usage = "TBA";
 SampleNineParamFunction::usage = "TBA";
+SampleTenParamFunction::usage = "TBA";
+SampleTwelveParamFunction::usage + "TBA";
 SamplePowderXRDfunctionInvSymm::usage = "TBA";
 
 GetBraggList::usage = "Get the braggMultiplicityListSimple values";
@@ -403,8 +407,24 @@ fourParameterFunction[(gamma1_)?NumericQ, (gamPID1_)?NumericQ, (aHex_)?NumericQ,
    (qVal_)?NumericQ] := powderXRDfunctionInvSymm[gamma1, gamPID1, 1., 2.5, 1., 1., -2.5, aHex, cHex, 3000., 0., scale, 0.003, 
    0.5, braggMultiplicityListSimple, 0.09, 1.6, 0.388, 0.277, 0.569, 2.01, 3., 1.75, 0.6, 120., 0., 0.1, qVal];
    
-nineParameterFunction[(gamma1_)?NumericQ,(gamPID1_)?NumericQ,(occ_)?NumericQ,(zoff1_)?NumericQ,(gamPID2_)?NumericQ,(frac1_)?NumericQ,(zoff2_)?NumericQ,(aHex_)?NumericQ,(cHex_)?NumericQ, (scale_)?NumericQ,
-      (qVal_)?NumericQ] := powderXRDfunctionInvSymm[gamma1, gamPID1, occ, zoff1, gamPID2, frac1, zoff2, aHex, cHex, 3000., 0., scale, 0.003, 0.5, braggMultiplicityListSimple, 0.09, 1.6, 0.388, 0.277, 0.569, 2.01, 3., 1.75, 0.6, 120., 0., 0.1, qVal];
+
+	  
+SampleFourParamFunction[measuredData_, (gamma1_)?NumericQ, (gamPID1_)?NumericQ, (aHex_)?NumericQ, (cHex_)?NumericQ, (scale_)?NumericQ] := Module[
+{m=measuredData, n, retval={},funcval},
+n=Length[m];
+For[i=1, i<=n, i++,
+funcval=fourParameterFunction[gamma1,gamPID1,aHex,cHex,scale,m[[i]][[1]]];
+(*Print[m[[i]][[1]]];*)
+(*Print[funcval];*)
+AppendTo[m[[i]],funcval];
+AppendTo[retval,m[[i]]];
+(*Print[retval];*)
+];
+Return[retval]
+];
+
+	  
+			
 
 SampleFourParamFunction[measuredData_, (gamma1_)?NumericQ, (gamPID1_)?NumericQ, (aHex_)?NumericQ, (cHex_)?NumericQ, (scale_)?NumericQ] := Module[
 {m=measuredData, n, retval={},funcval},
@@ -420,11 +440,55 @@ AppendTo[retval,m[[i]]];
 Return[retval]
 ];
 
+
+nineParameterFunction[(gamma1_)?NumericQ,(gamPID1_)?NumericQ,(occ_)?NumericQ,(zoff1_)?NumericQ,(gamPID2_)?NumericQ,(frac1_)?NumericQ,(zoff2_)?NumericQ,(aHex_)?NumericQ,(cHex_)?NumericQ, (scale_)?NumericQ,
+      (qVal_)?NumericQ] := powderXRDfunctionInvSymm[gamma1, gamPID1, occ, zoff1, gamPID2, frac1, zoff2, aHex, cHex, 3000., 0., scale, 0.003, 0.5, braggMultiplicityListSimple, 0.09, 1.6, 0.388, 0.277, 0.569, 2.01, 3., 1.75, 0.6, 120., 0., 0.1, qVal];
+	  
+
+
 SampleNineParamFunction[measuredData_, (gamma1_)?NumericQ,(gamPID1_)?NumericQ,(occ_)?NumericQ,(zoff1_)?NumericQ,(gamPID2_)?NumericQ,(frac1_)?NumericQ,(zoff2_)?NumericQ,(aHex_)?NumericQ,(cHex_)?NumericQ, (scale_)?NumericQ] := Module[
 {m=measuredData, n, retval={},funcval},
 n=Length[m];
 For[i=1, i<=n, i++,
 funcval=nineParameterFunction[gamma1,gamPID1,occ,zoff1,gamPID2,frac1,zoff2,aHex,cHex,scale,m[[i]][[1]]];
+
+AppendTo[m[[i]],funcval];
+AppendTo[retval,m[[i]]];
+(*Print[retval];*)
+];
+Return[retval]
+];
+
+
+tenParameterFunction[(gamma1_)?NumericQ,(gamPID1_)?NumericQ,(strain_)?NumericQ,(zoff1_)?NumericQ,(gamPID2_)?NumericQ,(frac1_)?NumericQ,(zoff2_)?NumericQ,(aHex_)?NumericQ,(cHex_)?NumericQ, (scale_)?NumericQ,
+      (qVal_)?NumericQ] := powderXRDfunctionInvSymm[gamma1, gamPID1, 1., zoff1, gamPID2, frac1, zoff2, aHex, cHex, 3000., strain, scale, 0.003, 0.5, braggMultiplicityListSimple, 0.09, 1.6, 0.388, 0.277, 0.569, 2.01, 3., 1.75, 0.6, 120., 0., 0.1, qVal];
+
+
+SampleTenParamFunction[measuredData_,
+(aHex_)?NumericQ, (cHex_)?NumericQ, (gamma1_)?NumericQ, (frac1_)?NumericQ, (zoff1_)?NumericQ, (zoff2_)?NumericQ,(gamPID1_)?NumericQ, (gamPID2_)?NumericQ, (strain_)?NumericQ, (scale_)?NumericQ] := Module[
+{m=measuredData, n, retval={},funcval},
+n=Length[m];
+For[i=1, i<=n, i++,
+funcval=tenParameterFunction[gamma1,gamPID1,strain,zoff1,gamPID2,frac1,zoff2,aHex,cHex,scale,m[[i]][[1]]];
+
+AppendTo[m[[i]],funcval];
+AppendTo[retval,m[[i]]];
+(*Print[retval];*)
+];
+Return[retval]
+];
+
+
+twelveParameterFunction[(gamma1_)?NumericQ,(gamPID1_)?NumericQ,(strain_)?NumericQ,(zoff1_)?NumericQ,(gamPID2_)?NumericQ,(frac1_)?NumericQ,(zoff2_)?NumericQ,(aHex_)?NumericQ,(cHex_)?NumericQ, (dev_)?NumericQ, (voi_)?NumericQ, (scale_)?NumericQ,
+      (qVal_)?NumericQ] := powderXRDfunctionInvSymm[gamma1, gamPID1, 1., zoff1, gamPID2, frac1, zoff2, aHex, cHex, 3000., strain, scale, 0.003, voi, braggMultiplicityListSimple, dev, 1.6, 0.388, 0.277, 0.569, 2.01, 3., 1.75, 0.6, 120., 0., 0.1, qVal];
+
+
+SampleTwelveParamFunction[measuredData_,
+(gamma1_)?NumericQ,(gamPID1_)?NumericQ,(strain_)?NumericQ,(zoff1_)?NumericQ,(gamPID2_)?NumericQ,(frac1_)?NumericQ,(zoff2_)?NumericQ,(aHex_)?NumericQ,(cHex_)?NumericQ, (dev_)?NumericQ, (voi_)?NumericQ,(scale_)?NumericQ] := Module[
+{m=measuredData, n, retval={},funcval},
+n=Length[m];
+For[i=1, i<=n, i++,
+funcval=twelveParameterFunction[gamma1,gamPID1,strain,zoff1,gamPID2,frac1,zoff2,aHex,cHex, dev, voi, scale, m[[i]][[1]]];
 
 AppendTo[m[[i]],funcval];
 AppendTo[retval,m[[i]]];

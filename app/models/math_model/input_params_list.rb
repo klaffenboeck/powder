@@ -27,7 +27,12 @@ class MathModel::InputParamsList
     exec = setting.executable
     run_list = MathModel::RunList.new
     each do |input|
+      p "INPUT"
+      p input
+      p "SETTING"
+      p setting
       run = exec.run(input, setting)
+      p "RUN CREATED"
       run_list.add(run)
     end
     return run_list

@@ -26,7 +26,7 @@ class Estimation::RawData < ActiveRecord::Base
   
   def map_normal_to_sample_point(normal, range_array)
     range = range_array[1] - range_array[0]
-    range_array[0] + range * normal
+    (range_array[0] + range * normal).round(12)
   end
   
   def nspm

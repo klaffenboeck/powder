@@ -13,6 +13,7 @@
  *= require_tree .
  *= require jquery-ui
  *= require bootstrap/dist/css/bootstrap.min
+ *= require fontawesome/css/font-awesome.min
  *= require spectrum/spectrum
  *= require_self
  */

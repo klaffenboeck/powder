@@ -2,7 +2,7 @@ body {
   background-color: #fff;
   color: #333;
   font-family: verdana, arial, helvetica, sans-serif;
-  font-size: 13px;
+  font-size: 11px !important;
   line-height: 18px;
 }
 
@@ -261,15 +261,17 @@ g.peak {
   pointer-events: all;
 }
 
-#navigation, #comparison {
+#comparison {
   height: 400px;
   overflow-y: scroll;
   
 }
 
 #navigation {
-    width: 450px;
+    width: 435px;
     float: right;
+    overflow-y: scroll;
+    height: 620px;
 }
 
 #comparison {
@@ -290,19 +292,43 @@ g.peak {
   height: 120px;
 }
 
+#gl_legend {
+  margin-top: 7px;
+  cursor: pointer;
+}
+
 #brush {
   width: 10px;
   height: 500px;
   // border: 1px solid gray;
   position: relative;
   float: right;
+  margin-right: 15px;
 }
 
 #legend-brush-group {
   position: relative;
-  margin-left: 150px;
+  margin-left: 177px;
   width: 65px;
-  height: 500px;
+  height: 400px;
+}
+
+#legend-scale {
+  position: absolute;
+  left: -30px;
+  .sliderscale {
+    path.domain {
+      display: none;
+    }
+    .tick line {
+      stroke: black;
+    }
+    font-size: 9px;
+  }
+}
+
+path.errorline:hover {
+  stroke: black;
 }
 
 .handle:hover {
@@ -328,12 +354,15 @@ g.peak {
   }
   .legend {
     float: right;
-    padding-top: 20px
+    padding-top: 20px;
+    .legend-entry {
+      cursor: pointer;
+    }
   }
   .error {
     position: absolute;
     right: 100px;
-    top: 360px;
+    top: 380px;
   }
 }
 
@@ -465,23 +494,169 @@ td.thumbnail {
 
 .set-exclude {
   position: absolute;
-  right: 0;
-  top: 100px;
+  right: 235px;
+  top: 320px;
 }
 
 .create-overview {
   position: absolute;
-  right: 0;
-  top: 140px;
+  right: 110px;
+
   color: white !important;
+  &.new-base-selection {
+    top: 320px;
+  }
+  &.new-sub-selection {
+    top: 640px;
+  }
 }
+
+
 
 #visual-cluster-wrapper {
   position: relative;
+  .cluster.region {
+    color: #3b87d4;
+    cursor: pointer;
+  }
 }
+
+
 
 #panel-colorpicker-wrapper {
   float: right;
   display: none;
 }
+
+#smd {
+  position: absolute;
+  top: 340px;
+  left: 600px;
+  height: 440px;
+  width: 240px;
+  z-index: 1000000;
+  .run-id {
+    width: 40px;
+  }
+  .run-loaded {
+    width: 20px;
+  }
+  #current {
+    position: relative;
+    height: 58px;
+    background-color: rgba(166,206,227, 0.125);
+    #current-progress-switch {
+      position: absolute;
+      top: 18px;
+      left: 16px;
+    }
+
+    .run-loaded {
+      input {
+        display: none;
+      }
+    }
+  }
+  #order-bar {
+    height: 15px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+
+  }
+  #runlist {
+    height: 270px;
+    width: 240px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    .run {
+      width: 240px;
+      .run-loaded {
+        text-align: center;
+      }
+      &:hover {
+        background-color: rgba(178,223,138, 0.125);
+        .run-loaded {
+          text-align: center;
+          background-color: #ffffff !important;
+        }
+      }
+      .run-loaded:hover {
+        background-color: rgba(255,127,0, 0.08125) !important;
+        &~td {
+          background-color: rgba(255,127,0, 0.08125) !important;
+        }
+      }
+      .clickable {
+        cursor: pointer;
+        &.highlightable {
+          &:hover {
+            background-color: rgba(178,223,138, 0.25);
+          }
+        }
+      }
+    }
+  }
+
+  td.value {
+    width: 30px;
+    height: 53px;
+    position: relative;
+  }
+  div.bar {
+    border: 1px solid black;
+    width: 15px; 
+    position: absolute;
+    bottom: 3px;
+    left: 8px;
+  }
+
+}
+
+
+/* ======= order-bar ========= */
+
+#order-bar {
+  padding-left: 20px;
+  .segment {
+    height: 12px;
+    width: 30px;
+    float: left;
+    text-align: center;
+    font-size: 9px;
+    cursor: pointer;
+    &#segment-id {
+      width: 40px
+    }
+    &:hover {
+      background-color: #eee;
+
+    }
+
+  }
+}
+
+
+/* ======= projection-control ========= */
+
+#projection-control {
+  width: 140px;
+  height: 40px;
+
+  position: absolute;
+  top: 265px;
+  left: 570px;
+  text-align: right;
+  .axis-selector {
+    margin-right: 4px;
+  }
+}
+
+#projection-style {
+  position: absolute;
+  top: 10px;
+  left: 765px;
+  width: 180px;
+}
+
+
 

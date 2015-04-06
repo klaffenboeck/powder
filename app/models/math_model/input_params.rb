@@ -18,7 +18,8 @@ class MathModel::InputParams
   end
   
   def to_s
-    params.join(" ")
+    mapped = params.map {|num| "%.15f" % num}
+    mapped.join(" ")
   end
   
   alias_method :to_string, :to_s

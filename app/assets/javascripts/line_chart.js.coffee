@@ -16,6 +16,15 @@ class @Chart
   getLines: =>
     @display.lines
 
+  addBlock: (block) =>
+    @display.addBlock(block)
+
+  drawBlocks: =>
+    @display.drawBlocks()
+
+  removeBlocks: =>
+    @display.removeBlocks()
+
   checkBrush: =>
     extent = @brush.extent()
     return false if extent[0][0] == extent[1][0] or extent[0][1] == extent[1][1] 
@@ -25,10 +34,10 @@ class @Chart
     valuesX = [params[0][0], params[1][0]]
     valuesY = [params[0][1], params[1][1]]
     block = new Block({domainX: @domainX, domainY: @domainY, valuesX: valuesX, valuesY: valuesY, name: "block" + _blockCounter})
-    @addLine(block)
+    @addBlock(block)
     _blockCounter += 1
-    @drawLines()
-    window.m.exclusions_list.addBlockToCurrent(block)
+    @drawBlocks()
+    window.m.selection_manager.addBlock(block)
     @brush.extent([[0,0],[0,0]])
     @display.svg_brush
       .call(@brush)
@@ -87,10 +96,12 @@ class @LineChart extends Chart
     @display.svg_brush
       .call(@brush)
 
+
 class @ErrorChart extends Chart
   _bottom = null
   _top = null
   constructor: (options={}) ->
+    @_linelist = []
     boundaries = new Boundaries
       margin:
         top: 10
@@ -98,7 +109,7 @@ class @ErrorChart extends Chart
         bottom: 30
         left: 50
       total_width: 540
-      total_height: 160
+      total_height: 260
     @stepsX = options.stepsX ? data_angles
     @domainX = new Domain
       range: @stepsX
@@ -116,6 +127,7 @@ class @ErrorChart extends Chart
       yAxis: axisY
       name: "errorview"
     @lines = []
+    @_current_extent = 
 
     _bottom = @domainY.getMin()
     _top = @domainY.getMax()
@@ -140,7 +152,7 @@ class @ErrorChart extends Chart
 
       )
       .on("brushend", =>
-        console.log(@brush.extent())
+        @setCurrentExtent(@brush.extent())
         @display.svg_brush
           .call(@brush)
       )
@@ -148,14 +160,51 @@ class @ErrorChart extends Chart
     @display.svg_brush
       .call(@brush)
 
+  createLine: (name, values) =>
+    line = new ErrorLine
+      name: name
+      domainX: @domainX
+      domainY: @domainY
+      valuesX: window.m.data_angles.angles
+      valuesY: values
+      color: window.m.red
+
+    @_linelist.push(line)
+    @display.addLine(line)
+
+  removeAllLines: =>
+    @display.removeAllLines()
+
+  setCurrentExtent: (extent) =>
+    @_current_extent = [extent[0][0], extent[1][0]]
+
+  getCurrentExtent: =>
+    @_current_extent
+
+
+  drawExtentManually: (left, right) =>
+    if left.constructor == Array
+      right = left[1]
+      left  = left[0]
+    _bottom = @domainY.getMin()
+    _top = @domainY.getMax()
+    extent = [[left, _bottom], [right, _top]]
+    @brush.extent(extent)
+    @setCurrentExtent(extent)
+    @display.svg_brush.call(@brush)
+  
+
+
+
+
 
 class @NavChart extends Chart
   constructor: (options) ->
-    {@ticks, @boundaries, @domain, @quality, @name} = options
+    {@ticks, @boundaries, @domain, @quality, @quality_axis, @name} = options
     @set_default_boundaries() if not @boundaries
     @calc_ticks() if not @ticks
     @axisX = new Axis({domain: @domain, ticks: @ticks})
-    @axisY = new KAxis({domain: @quality})
+    @axisY = new Axis({domain: @quality_axis})
     @display = new NavDisplay
       select: "#navigation"
       boundaries: @boundaries
@@ -263,7 +312,7 @@ class @InteractiveMiniChart extends MiniChart
 
 
 class @Domain
-  scaletyp = undefined
+  # scaletyp = undefined
   constructor: (options={}) ->
     {@min, @max, @scaletype, @order} = options
     @name = options.name ? ""
@@ -271,12 +320,13 @@ class @Domain
     @width = options.width ? 0
     @height = options.height ? 0
     @setup()
+    @_scaletyp
 
   setup: =>
     scaledefault = if @width then "linear" else "log"
-    scaletyp = @scaletype ? scaledefault
-    scale = d3.scale[scaletyp]().clamp(true)
-    scale.base(10) if scaletyp == "log"
+    @_scaletyp = @scaletype ? scaledefault
+    scale = d3.scale[@_scaletyp]().clamp(true)
+    scale.base(10) if @_scaletyp == "log"
     @scale = scale
     @rangeband = scale.range([@height, @width])
     _range = d3.extent(@range)
@@ -307,7 +357,7 @@ class @Domain
     @range[1]
 
   getScaleType: =>
-    return scaletyp
+    return @_scaletyp
 
   getScale: =>
     return @scale
@@ -365,6 +415,7 @@ class @BaseDisplay
     {@select, @boundaries, @xAxis, @yAxis} = options
     @name = options.name ? "undeclared"
     @lines = {}
+    @blocks = {}
     @setup()
 
     
@@ -431,6 +482,17 @@ class @BaseDisplay
       line = @lines[key]
       @drawLine(line)
 
+  addBlock: (block) =>
+    @blocks[block.name] = block
+
+  drawBlocks: =>
+    # console.log(@blocks)
+    keys = Object.keys(@blocks)
+    for key, index in keys
+      block = @blocks[key]
+      @drawLine(block)
+
+
   drawLine: (line, dur = 750) =>
     return_function = (d) ->
       line.line(d)
@@ -460,6 +522,24 @@ class @BaseDisplay
     .transition().delay(0).duration(500)
     .style("opacity", 0)
     .remove()
+
+  removeAllLines: =>
+    lines = _.keys(@lines)
+    for line in lines
+      @view.selectAll("." + line)
+      .data([]).exit()
+      .remove()
+
+    @lines = {}
+
+
+  removeBlocks: =>
+    #for block in @blocks
+    @view.selectAll(".line.block.area")
+      .data([]).exit()
+      .style("opacity", 0)
+      .remove()
+    @blocks = {}
 
 class @BrushDisplay extends BaseDisplay
   constructor: (options) ->
@@ -492,7 +572,7 @@ class @Display extends BaseDisplay
 class @NavDisplay extends BaseDisplay
   constructor: (options) ->
     super(options)
-    @drawAxisX()
+    @drawAxis()
 
 
 class @BaseLine
@@ -580,6 +660,17 @@ class @Line extends BaseLine
         .interpolate("basis")
         .x(funcX)
         .y(funcY)
+
+class @ErrorLine extends Line
+  constructor: (options = {}) ->
+    super(options)
+
+  extension: =>
+    "-line line errorline"
+
+
+  _opacity: =>
+    return 0.45
 
 class @Block extends BaseLine
   constructor: (options={}) ->
@@ -680,7 +771,7 @@ class @EstNavBar extends Line
     super(options)
     @key = options.key
     @valuesY = [@domainY.minVal(), @domainY.maxVal()]
-    @color = new Color("#ee0000")
+    @color = options.color ? new Color("#ee0000")
     @setPosition(options.position)
 
   setPosition: (value) =>

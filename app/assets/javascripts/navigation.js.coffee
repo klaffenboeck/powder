@@ -7,56 +7,79 @@ class @Navigation
     @set_default_boundaries() if not @boundaries
     @parameter_space = @estimation_function.parameter_space
     @busy = true    
+    @_allow_preview = true # false
     @quality = new Domain
       name: "quality"
-      range: [1,10000]
+      #range: [1,10000]
+      range: [0,1]
       height: @boundaries.height
       scaletype: "linear"
-      order: "desc"
+      #order: "desc"
+    @quality_axis_domain = new Domain
+      name: "quality-axis"
+      range: [0, 1]
+      height: @boundaries.height
+      scaletype: "linear"
     @charts = {}
     @value_arrays = {}
     @current_values = {}
-    @preview_color = new Color("red")
+    @preview_color = new Color("#e31a1c")
     for key, range of @parameter_space
       _domain = new Domain({name: key, range: range, width: @boundaries.width })
-      _chart = new NavChart({boundaries: @boundaries, quality: @quality, domain: _domain, name: key })
+      _chart = new NavChart({boundaries: @boundaries, quality: @quality, domain: _domain, quality_axis: @quality, name: key })
       @value_arrays[key] = _domain.width_to_values(2)
       @setup_mousedown(_chart)
       _line = new EstLine({name: key, key: key, domainY: @quality, domainX: _domain, valuesX: @value_arrays[key]})
       _preview_line = new EstLine({name: key + "-preview", key: key, domainY: @quality, domainX: _domain, valuesX: @value_arrays[key], color: @preview_color})
-      _navbar = new NavBar({name: key + "-navbar", key: key, domainY: @quality, domainX: _domain, position: _chart.currX()})
-      _estnavbar = new EstNavBar({name: key + "-navbar-preview", key: key, domainY: @quality, domainX: _domain, position: _chart.currX()})
+      _navbar = new NavBar({name: key + "-navbar", key: key, domainY: @quality_axis_domain, domainX: _domain, position: _chart.currX()})
+      _estnavbar = new EstNavBar({name: key + "-navbar-preview", key: key, domainY: @quality_axis_domain, domainX: _domain, position: _chart.currX(), color: @preview_color})
       _preview_line.hide()
+      #_line.hide()
+      #_navbar.hide()
+      _estnavbar.hide()
+
       _chart.addLine(_line)
       _chart.addLine(_preview_line)
       _chart.addLine(_navbar)
       _chart.addLine(_estnavbar)
       _chart.drawNavBar()
+
       _curr = @current_position
       @charts[key] = _chart
     # cvh = new ComplexViewHolder({domains: @getAllDomains(), slider: @slider})
 
   mousedown: (options) ->
-    console.log(this)
+    # console.log(this)
 
   setup_mousedown: (chart) =>
     _chart = chart
     _overlay = chart.display.overlay
     chart.display.overlay.on("mousedown", =>
+
       _chart.mousedown()
+      window.m.selection_manager.startSpinner()
+      run = window.m.selection_manager.full_run_list.findRun(@current_x_values("array"))
       @estimate_all_lines()
       chart.drawNavBar()
-      $.ajax(
-        url: document.URL + "/remotepost"
-        cache: false
-        type: "POST"
-        data:
-          parameters: @current_x_values()
-      ).done (json) ->
-        window.m.hist.createRun(json.run)
-        window.m.hist.render()
-        window.manager.updateLineChart(json.run)
-      )
+      if run
+        window.m.selection_manager.display_run_list.addRun(run)
+        window.m.selection_manager.updateDisplayRunList(run)
+        window.manager.updateLineChart(run)
+      else
+        $.ajax(
+          url: document.URL + "/remotepost"
+          cache: false
+          type: "POST"
+          data:
+            parameters: @current_x_values()
+        ).done (json) ->
+          #window.m.hist.createRun(json.run)
+          #window.m.hist.render()
+          run = window.m.selection_manager.full_run_list.addRun(json.run) #Run.fromObject(json.run)
+          window.m.selection_manager.display_run_list.addRun(run)
+          window.m.selection_manager.updateDisplayRunList(run)
+          window.manager.updateLineChart(run)
+    )
     _overlay.on("mouseover", =>
       @show_preview_lines()
       @fixed_hover = @current_x_values()
@@ -78,10 +101,10 @@ class @Navigation
       width: 100
       height: 100
       margin:
-        bottom: 35
+        bottom: 25
         left: 20
         top: 30
-        right: 10
+        right: 20
 
   current_positions: =>
     _positions = []
@@ -97,6 +120,12 @@ class @Navigation
 
   getDomain: (index) =>
     @getAllDomains()[index]
+
+  getEstimationFunction: =>
+    @estimation_function
+
+  setEstimationFunction: (func) =>
+    @estimation_function = func
 
 
   current_x_values: (returntype = "hash")=>
@@ -135,19 +164,21 @@ class @Navigation
     _retval = []
     for value in _values
       _params[_samplekey] = value
-      _retval.push(@estimation_function.est(_params))
+      _retval.push(@estimation_function.estimate_normal(_params))
     _retval
 
-  estimate_all_lines: =>
+  estimate_all_lines: (time = 750) =>
+    @_allow_preview = true
     _fixed = @current_x_values()
     for key, chart of @charts
       _line = chart.getLines()[key]
       _line.valuesY = @estimate_line(_line, _fixed)
-      chart.drawLine(_line)
-      chart.drawNavBar()
+      chart.drawLine(_line, time)
+      chart.drawNavBar("-navbar", time)
 
 
   estimate_preview: (key = null, value = null) =>
+    # console.log("estimate preview called")
     _fixed = @current_x_values()
     _fixed[key] = value if key and value
     if key instanceof Array
@@ -163,13 +194,14 @@ class @Navigation
 
 
   show_preview_lines: =>
-    for key, chart of @charts
-      _line = chart.getLines()[key + "-preview"]
-      _line.show()
-      _bar = chart.getLines()[key + "-navbar-preview"]
-      _bar.show()
-      chart.drawLine(_line, 0)
-      chart.drawLine(_bar, 0)
+    if @_allow_preview
+      for key, chart of @charts
+        _line = chart.getLines()[key + "-preview"]
+        _line.show()
+        _bar = chart.getLines()[key + "-navbar-preview"]
+        _bar.show()
+        chart.drawLine(_line, 0)
+        chart.drawLine(_bar, 0)
 
 
   hide_preview_lines: =>
@@ -180,6 +212,13 @@ class @Navigation
       _bar.hide()
       chart.drawLine(_line, 0)
       chart.drawLine(_bar, 0)
+
+
+  changeDomain: (bounds) =>
+    @quality.domain.domain(bounds)
+    for name, chart of @charts
+      chart.display.redrawAxisY(bounds[0], bounds[1])
+    @estimate_all_lines(300)
 
 
 class @ComplexViewHolder
@@ -194,7 +233,7 @@ class @ComplexViewHolder
     slides = []
     @width = options.width ? 200
 
-  newProjectionView: (x = 0, y = 3) =>
+  newProjectionView: (x = 0, y = 1) =>
     # $("#webgl-area").prepend(@getTemplate())
     view = d3.select("#webgl-area")
     id = "complex-view-" + @getSlideCount()
@@ -229,7 +268,6 @@ class @ComplexViewHolder
 
   getCurrentSlide: =>
     return _current_slide
-
 
   getDomain: (number) =>
     return _nav_domains[number]
@@ -304,6 +342,17 @@ class @ComplexViewHolder
     ).mouseleave( (e) =>
       that.resetClusterBounds()
     )
+
+  getMaxima: (x, y) =>
+    for slide in @getSlides()
+      slide.getMaxima(x, y)
+
+  setDisplayStyle: (_type = 0) =>
+    type = parseFloat(_type)
+    GlobalWebGL.setDiscrete(type)
+    @getCurrentSlide().redraw()
+    window.m.gl_legend.redraw()
+
 
 
 

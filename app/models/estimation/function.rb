@@ -18,12 +18,14 @@ class Estimation::Function < ActiveRecord::Base
       func = new(project_setting: setting)
       self.transaction do
         func.generate_raw_data
+        p "generate raw data"
+        p func.raw_data
         func.save
         func.generate_input_params_list
         func.generate_run_list
-        func.save
+        func.save #func
         func.run_list.calculate_quality_metrics
-
+        p "calculated quality metrics"
         # R.matrix = func.run_list.input_matrix
         # R.result = func.run_list.result_vector
         # R.eval "output <- mlegp(matrix, result)"
