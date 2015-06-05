@@ -205,8 +205,8 @@ class @ParameterSpace
       size = 150
     else
       size = 100
-      left = 20
-      right = 20
+      left = 30
+      right = 10
     boundaries = new Boundaries
       width: size
       height: size

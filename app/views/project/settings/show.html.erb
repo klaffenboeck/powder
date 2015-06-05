@@ -4,7 +4,7 @@ attribute vec2 a_position;
 attribute float a_color;
 
 uniform float u_size;
-uniform int u_discrete;
+//uniform int u_discrete;
 
 invariant varying lowp float v_color;
 
@@ -70,11 +70,12 @@ void main(void) {
 
         <div id="min-quality" class="input-group input-group-sm quality-changer">
           <span class="input-group-addon" id="min-value-addon">min</span>
-          <span><input type="number" name="min-value" id="min-value" class="form-control input-group" value="0.00" min="0.00" max="0.99" step="0.01" pattern="\d\.\d\d" /></span>
+          <input type="number" name="min-value" id="min-value" class="form-control input-group" value="0.00" min="0.00" max="0.99" step="0.01" pattern="\d\.\d\d" />
         </div>
         <div id="max-quality" class="input-group input-group-sm quality-changer">
-          <input type="number" name="max-value" id="max-value" class="form-control" value="1.00" min="0.01" max="1.00" step="0.01" pattern="\d\.\d\d" /></span>
           <span class="input-group-addon" id="max-value-addon">max</span>
+          <input type="number" name="max-value" id="max-value" class="form-control" value="1.00" min="0.01" max="1.00" step="0.01" pattern="\d\.\d\d" />
+
         </div>
       <div id="projection-style" class="input-group input-group-sm">
       <span class="glyphicon glyphicon-eye-open input-group-addon" id="eye-addon"></span> <select id="projection-style-select" class="form-control" aria-describedby="eye-addon">
