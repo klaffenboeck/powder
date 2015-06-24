@@ -1,4 +1,4 @@
-#!/usr/local/bin/MathematicaScript -script
+#!/Applications/Mathematica.app/Contents/MacOS/MathematicaScript -script
 
 aHex = ToExpression[$ScriptCommandLine[[2]]];
 cHex = ToExpression[$ScriptCommandLine[[3]]];
@@ -13,9 +13,7 @@ dev = ToExpression[$ScriptCommandLine[[11]]];
 voi = ToExpression[$ScriptCommandLine[[12]]];
 scale = ToExpression[$ScriptCommandLine[[13]]] / 1000000;
 
-(*Print[scale];*)
-Print["HELLO"];
-Print[aHex];
+Print[scale];
 
 (*gamma1 = ToExpression[$ScriptCommandLine[[2]]];
 gamPID1 = ToExpression[$ScriptCommandLine[[3]]];
@@ -38,8 +36,8 @@ pidTPPdata = Table[{pidTPPdata[[ii]][[1]], pidTPPdata[[ii]][[2]]}, {ii, 1,
    Length[pidTPPdata]}];
    
 Get["PowderPackage.m" , Path->{"packages"}];
-SetupPowder["/home/chuck/powder/lib/math_models/mathematica/packages"];
-(*Print[mono];*)
+SetupPowder["/Users/HappyMandi/Desktop/Programming/ror/Powder/lib/mathematica/packages"];
+Print[mono];
 (*sampled = SamplePowderXRDfunctionInvSymm[pidTPPdata, angle1, angPID1, occ, zoff1, angPID2, frac1, zoff2, 11.49, 10.046, 6000., strain, scale, 0.003, voigt, 0.09, 1.6, 0.388, 0.277, 0.569, 2.01, 3.0, 1.75, 0.6, 120., mono, 0.0];*)
 (*four = fourParameterFunction[angle1, angPID1, occ, zoff1, angPID2, frac1];*)
 (*Export["sampled.json",sampled]
