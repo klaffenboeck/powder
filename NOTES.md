@@ -1,3 +1,54 @@
+Important Commands and Links
+============================
+
+How to document
+---------------
+
+* [Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+* [Getting Started with YARD](https://github.com/lsegal/yard/wiki/GettingStarted)
+* [Supported Tags in YARD](http://www.rubydoc.info/gems/yard/file/docs/Tags.md)
+
+
+Important Rake commands
+-----------------------
+
+```ruby
+class Article < ActiveRecord::Base
+  # TODO add named_scopes
+  # FIXME method A is broken
+  # OPTIMIZE improve the code
+
+  has_many :comments
+  ...
+end
+```
+
+To list these, use following rake task
+
+```sh
+rake notes
+rake notes:todo
+rake notes:fixme
+rake notes:optimize
+rake notes:custom ANNOTATION:MYANNO
+```
+
+Resource: http://rubyquicktips.com/post/385665023/fixme-todo-and-optimize-code-comments
+
+About testing
+-------------
+
+Unfortunately, I haven't started it yet, but once I do... :-)
+
+* http://rspec.info/
+
+
+Leftovers
+=========
+
+What follows are leftovers from when I started writing this documentation. 
+This is subject to be removed!
+
 == Next steps
 
 === Very next step: jsonify run

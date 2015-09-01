@@ -1,1 +1,3 @@
-- LICENSE SYSTEM_WORKFLOW.rdoc NOTES.rdoc
+--markup-provider=redcarpet
+--markup=markdown
+- LICENSE SYSTEM_WORKFLOW.md NOTES.md
