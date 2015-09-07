@@ -1,29 +1,31 @@
 README
-==
+======
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Next Steps
+----------
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* Update Gaussian Process Model according to the new runs
+  * Start with adding a method to receive both run_lists to the {Project::Manager}
+    * This method won't be useful for the application itself, but for the commandline
+  * Then implement an according method into {Estimation::Function}
 
 
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+Quicknote
+---------
+
+Have a look at [README DRIVEN DEVELOPMENT](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html) by Tom Preston-Werner.
+
+
+Changelog
+---------
+
+**2015/09/02**
+* documented {Estimation::Function}
+  * still needs a little bit of improvement
+* working on adaptive update
+* improved {MathModel::RunList}
+  * especially {MathModel::RunList#get_input_matrix}
+
+**2015-09-01:**
+* changed readme
+* cleaned git

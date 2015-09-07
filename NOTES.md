@@ -9,6 +9,9 @@ How to document
 * [Supported Tags in YARD](http://www.rubydoc.info/gems/yard/file/docs/Tags.md)
 
 
+### More possible resources
+  * [documenting def_delegate](http://stackoverflow.com/questions/14891284/documenting-def-delegators-with-yardoc)
+
 Important Rake commands
 -----------------------
 

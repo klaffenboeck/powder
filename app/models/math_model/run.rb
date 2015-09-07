@@ -1,3 +1,11 @@
+
+# Math \Model \Runs
+# =================
+# 
+#
+# @author Manfred Klaffenboeck <manfred.klaffenboeck@univie.ac.at>
+#
+#
 class MathModel::Run < ActiveRecord::Base
   include SerialExt
   belongs_to :project_setting, class_name: "Project::Setting"
@@ -17,6 +25,7 @@ class MathModel::Run < ActiveRecord::Base
     return MathModel::Result.new(value: result["value"])
   end
    
+  # does this show up
   def get_measured_points
     measured_points.points
   end

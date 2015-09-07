@@ -44,10 +44,12 @@ fourParameterFunction::usage = "TBA";
 nineParameterFunction::usage = "TBA";
 tenParameterFunction::usage = "TBA";
 twelveParameterFunction::usage = "TBA";
+twelveParameterFunctionPID071::usage = "TBA";
 SampleFourParamFunction::usage = "TBA";
 SampleNineParamFunction::usage = "TBA";
 SampleTenParamFunction::usage = "TBA";
-SampleTwelveParamFunction::usage + "TBA";
+SampleTwelveParamFunction::usage = "TBA";
+SampleTwelveParamFunctionPID071::usage = "TBA";
 SamplePowderXRDfunctionInvSymm::usage = "TBA";
 
 GetBraggList::usage = "Get the braggMultiplicityListSimple values";
@@ -497,6 +499,23 @@ AppendTo[retval,m[[i]]];
 Return[retval]
 ];
 
+twelveParameterFunctionPID071[(gamma1_)?NumericQ,(gamPID1_)?NumericQ,(strain_)?NumericQ,(zoff1_)?NumericQ,(gamPID2_)?NumericQ,(frac1_)?NumericQ,(zoff2_)?NumericQ,(aHex_)?NumericQ,(cHex_)?NumericQ, (dev_)?NumericQ, (voi_)?NumericQ, (scale_)?NumericQ,
+      (qVal_)?NumericQ] := powderXRDfunctionInvSymm[gamma1, gamPID1, 1., zoff1, gamPID2, frac1, zoff2, aHex, cHex, 3000., strain, scale, 0.003, voi, braggMultiplicityListSimple, dev, 1.7, 0.58, 0.57, 0.9, 2.85, 4., 1.7, 1.2, 140., 0., 0.1, qVal];
+
+
+SampleTwelveParamFunctionPID071[measuredData_,
+(gamma1_)?NumericQ,(gamPID1_)?NumericQ,(strain_)?NumericQ,(zoff1_)?NumericQ,(gamPID2_)?NumericQ,(frac1_)?NumericQ,(zoff2_)?NumericQ,(aHex_)?NumericQ,(cHex_)?NumericQ, (dev_)?NumericQ, (voi_)?NumericQ,(scale_)?NumericQ] := Module[
+{m=measuredData, n, retval={},funcval},
+n=Length[m];
+For[i=1, i<=n, i++,
+funcval=twelveParameterFunctionPID071[gamma1,gamPID1,strain,zoff1,gamPID2,frac1,zoff2,aHex,cHex, dev, voi, scale, m[[i]][[1]]];
+
+AppendTo[m[[i]],funcval];
+AppendTo[retval,m[[i]]];
+(*Print[retval];*)
+];
+Return[retval]
+];
 
 SamplePowderXRDfunctionInvSymm[measuredData_, (gamma1_)?NumericQ,(gamPID1_)?NumericQ,(occ_)?NumericQ,(zoff1_)?NumericQ,(gamPID2_)?NumericQ,(frac1_)?NumericQ,(zoff2_)?NumericQ,(aHex_)?NumericQ,(cHex_)?NumericQ, (dia_)?NumericQ,(strain_)?NumericQ,(scale_)?NumericQ,(wid0_)?NumericQ,(peakType_)?NumericQ,(tempFactor_)?NumericQ,(bh1_)?NumericQ,(bh2_)?NumericQ,(bh3_)?NumericQ,(bh4_)?NumericQ,(bh5_)?NumericQ,(bh6_)?NumericQ,(bh7_)?NumericQ,(bh8_)?NumericQ,(bconst_)?NumericQ,(monoScale_)?NumericQ,(monoDev_)?NumericQ] := Module[
 {m=measuredData, n, retval={}, funcval},

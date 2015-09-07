@@ -13,10 +13,6 @@ dev = ToExpression[$ScriptCommandLine[[11]]];
 voi = ToExpression[$ScriptCommandLine[[12]]];
 scale = ToExpression[$ScriptCommandLine[[13]]] / 1000000;
 
-(*Print[scale];*)
-Print["HELLO"];
-Print[aHex];
-
 (*gamma1 = ToExpression[$ScriptCommandLine[[2]]];
 gamPID1 = ToExpression[$ScriptCommandLine[[3]]];
 occ = ToExpression[$ScriptCommandLine[[4]]];
@@ -33,7 +29,7 @@ list = ReadList["ExampleData/tppAtomXYZpositions", Number, RecordSeparators -> "
 
 list = ReadList["ExampleData/tppAtomXYZpositions", Number, RecordSeparators -> ","];
 
-pidTPPdata = Import["packages/pidTPPdata.csv","CSV"];
+pidTPPdata = Import["pidfiles/PID071_xrd.csv","CSV"];
 pidTPPdata = Table[{pidTPPdata[[ii]][[1]], pidTPPdata[[ii]][[2]]}, {ii, 1, 
    Length[pidTPPdata]}];
    

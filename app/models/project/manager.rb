@@ -20,6 +20,10 @@ class Project::Manager
     alias_method :setup, :factory
   end
   
+
+  ##
+  # Complete method commented out, can't remember why!
+  #
   def generate_estimation_function(type = "GaussianProcessModel")
     # function = ("Estimation::Function::" + type).constantize.new(project_setting: setting)
     # function.raw_data = generate_raw_data
@@ -32,14 +36,30 @@ class Project::Manager
     # rd.mu = R.pull "output$mu"
   end
 
+
+  ##
+  # generate and store (not save!) the raw data
+  # return raw_data [Estimation::RawData]
+  #
   def generate_raw_data
     self.raw_data = Estimation::RawData.factory(cols: parameter_space.size, rows: setting.accuracy)
   end
   
+
+  ## 
+  # generate and store (not save!) the input params list
+  #
+  # @overload generate_input_params_list
+  #   Uses the internally stored #raw_data and creates the input_params_list
+  #   @return input_params_list [MathModel::InputParamsList]
+  # @overload generate_input_params_list(input_raw_data)
+  #   Uses the passed input_raw_data to create the input_params_list
+  #   @param input_raw_data [Estimation::RawData]
+  #   @return generate_input_params_list(input_raw_data)
+  #
   def generate_input_params_list(input_raw_data = nil)
     rd = input_raw_data || self.raw_data
     self.input_params_list = MathModel::InputParamsList.factory(raw_data: rd, parameter_space: parameter_space)
-    #return "TEST"
   end
   
   def generate_function_run_list(var_input_params_list = nil)
@@ -69,5 +89,22 @@ class Project::Manager
     return params if params.class.to_s == type.capitalize
     parameter_space.send("input_" + type.downcase, params)
   end
+
+  def get_merged_run_list
+    MathModel::RunList.merge(setting.run_list, estimation_function.run_list)
+  end
   
 end
+
+
+
+
+
+
+
+
+
+
+
+
+

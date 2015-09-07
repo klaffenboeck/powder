@@ -1,3 +1,8 @@
+# Estimation Function
+# ===================
+#
+# @author Manfred Klaffenboeck <manfred.klaffenboeck@univie.ac.at>
+#
 class Estimation::Function < ActiveRecord::Base
   #alias_attribute :setting_id, :project_setting_id
   include SerialExt
@@ -14,6 +19,10 @@ class Estimation::Function < ActiveRecord::Base
   
 
   class << self
+    # factory for the Estimation Function
+    # @return [Estimation::Function]
+    # @note this method should be definitely revised, so it doesn't have to save so many things!!!
+    # OPTIMIZE: Why have there to be so many save calls? it should work without safe!!
     def factory(setting)
       func = new(project_setting: setting)
       self.transaction do
@@ -55,21 +64,24 @@ class Estimation::Function < ActiveRecord::Base
     end
   end
 
+
+  ##
+  # Create an alternative Gaussian Process Model
+  #
+  # @param result_vector [Vector] Vector containing the results
+  # @return [Estimation::Function]
+  #
+  # TODO: improve documentation!
+  #
   def create_alternative(result_vector)
-    p "BEFORE CONN"
     conn = Rserve::Connection.new
-    p "AFTER CONN"
     conn.eval("library(mlegp);")
-    p "AFTER MLEGP"
     r_matrix = Rserve::REXP::Wrapper.wrap(self.run_list.input_matrix)
     r_vector = Rserve::REXP::Wrapper.wrap(result_vector)
-    p "BEFORE ASSIGNMENTS"
     conn.assign("matrix", r_matrix)
     conn.assign("vector", r_vector)
-    p "AFTER ASSIGNMENTS"
     p result_vector
     output = conn.eval("output <- mlegp(matrix, vector)")
-    p "AFTER OUTPUT"
     r_output = output.to_ruby
     self.raw_data.mu = r_output["mu"][0,0]
     self.raw_data.sig2 = r_output["sig2"]
@@ -78,15 +90,26 @@ class Estimation::Function < ActiveRecord::Base
     return self
   end
 
-
+  ##
+  # generate raw data specifically for this estimation function
+  # @return [Estimation::RawData]
+  # @note maybe this method should be revised
+  #
   def generate_raw_data
     self.raw_data = Estimation::RawData.factory(cols: parameter_space.size, rows: project_setting.accuracy)
   end
   
+
+  ##
+  # Generate the input param list.
+  #
+  # @param input_raw_data [Estimation::RawData] Optional. Either pass in a raw_data object, 
+  #   or the one associated with the Estimation::Function will be used.
+  # @return [MathModel::InputParamsList]
+  #
   def generate_input_params_list(input_raw_data = nil)
     rd = input_raw_data || self.raw_data
     self.input_params_list = MathModel::InputParamsList.factory(raw_data: rd, parameter_space: parameter_space)
-    #return "TEST"
   end
   
   def generate_run_list(var_input_params_list = nil)

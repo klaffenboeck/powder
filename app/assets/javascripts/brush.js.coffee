@@ -1,11 +1,33 @@
 #= require line_chart
 
+###*
+# class Brush
+# has to be explained further
+###
 class @Brush
+
+  #
+  # constructor for Brush
+  #
+  #
   constructor: (options={}) ->
     {@select}
 
+
+# class Slider
+# has to be explained further
 class @Slider
+
+  # private variable to check if it is a new handle
   _new_handle = false
+
+  # construct a new Slider
+  #
+  # @param [Object] options the options that can be passed to the constructor.
+  # @option options [String] select  REQUIRED. The DOM-element to select.
+  # @option options [Legend] legend  REQUIRED. The legend associated with this slider.
+  # @option options [Domain] domain  necessity for D3, document further.
+  #
   constructor: (options={}) ->
     {@select, @legend} = options
     @boundaries = new Boundaries
@@ -21,7 +43,6 @@ class @Slider
     @subscribe(@legend)
 
     @domain = options.domain ? @defaultDomain()
-    # @legend_domain = @legendDomain()
 
     @axis = new Axis
       domain: @domain

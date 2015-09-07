@@ -14,7 +14,7 @@
 # Ignore all logfiles, tempfiles and documentation.
 /log/*.log
 /tmp
-/.yardoc/*
-/doc/*
+/.yardoc
+/doc
 /app/assets/doc
 
